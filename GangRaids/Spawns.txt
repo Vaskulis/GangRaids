@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GangRaids.Helpers
+{
+    class Class1
+    {
+        internal static void ConstructDefaultScene(out Vehicle ninef, out Vehicle ninef3, out Vehicle ninef5, out Vehicle speedo, out Vehicle buccaneer, out Vehicle tornado)
+        {
+
+            ninef = new Vehicle("NINEF", Vector3.Zero, 0f);
+            ninef.Orientation = new Quaternion(0f, 0f, 0.71999f, -0.6939844f);
+            ninef.Position = new Vector3(921.4164f, -1753.109f, 30.5646f);
+
+            ninef3 = new Vehicle("NINEF", Vector3.Zero, 0f);
+            ninef3.Orientation = new Quaternion(0f, 0f, 0.6932875f, 0.7206611f);
+            ninef3.Position = new Vector3(987.3845f, -1756.452f, 30.96087f);
+
+            ninef5 = new Vehicle("NINEF", Vector3.Zero, 0f);
+            ninef5.Orientation = new Quaternion(0f, 0f, -0.6548936f, 0.755721f);
+            ninef5.Position = new Vector3(935.7736f, -1656.151f, 29.42056f);
+
+            speedo = new Vehicle("SPEEDO", Vector3.Zero, 0f);
+            speedo.Orientation = new Quaternion(-0.01552222f, 0.0119307f, -0.1349821f, 0.9906546f);
+            speedo.Position = new Vector3(966.6843f, -1691.814f, 29.08317f);
+
+            buccaneer = new Vehicle("BUCCANEER", Vector3.Zero, 0f);
+            buccaneer.Orientation = new Quaternion(-0.02025709f, 0.03019483f, 0.98978f, -0.1378897f);
+            buccaneer.Position = new Vector3(959.4904f, -1693.389f, 28.68418f);
+
+            tornado = new Vehicle("TORNADO", Vector3.Zero, 0f);
+            tornado.Orientation = new Quaternion(-0.03419705f, -0.008305393f, -0.05533456f, 0.9978476f);
+            tornado.Position = new Vector3(962.0164f, -1704.337f, 29.60816f);
+        }
+    }
+}
