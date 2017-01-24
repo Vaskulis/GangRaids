@@ -60,7 +60,7 @@ namespace GangRaids.HelperClasses
             var foundOne = false;
             foreach (var item in schemeList)
             {
-                if ((playerPos.DistanceTo(item.Position) < 1500f) && (playerPos.DistanceTo(item.Position) > 300f))
+                if ((playerPos.DistanceTo(item.Position) < 800f) && (playerPos.DistanceTo(item.Position) > 250f))
                 {
                     scenarioScheme = item;
                     foundOne = true;
@@ -69,7 +69,6 @@ namespace GangRaids.HelperClasses
                 }
             }
             return foundOne;
-
         }
     }
 }

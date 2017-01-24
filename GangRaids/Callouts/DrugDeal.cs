@@ -32,6 +32,7 @@ namespace GangRaids.Callouts
         private Blip Buyer1Blip;
         private Blip Buyer2Blip;
         private Dictionary<Ped, Blip> PedBlipDict;
+        private List<Ped> FighterList;
 
         public static Blip PlayerStartPointBlip;
         public static Blip PlayerEndPointBlip;
@@ -40,6 +41,7 @@ namespace GangRaids.Callouts
         public static bool IsCurrentlyRunning = false;
 
         private bool IsWaitTimeOver;
+        private bool firstloop = true;
 
 
         public override bool OnBeforeCalloutDisplayed()
@@ -66,11 +68,18 @@ namespace GangRaids.Callouts
             Scenario.Initialize();
             IsCurrentlyRunning = true;
             PedBlipDict = new Dictionary<Ped, Blip> { };
+            FighterList = new List<Ped> { };
             DrugDealState = EDrugDealState.Accepted;
             SuspectsAreaBlip = new Blip(Scenario.Position, 50f);
             SuspectsAreaBlip.Alpha = 0.5f;
             SuspectsAreaBlip.Color = System.Drawing.Color.Yellow;
             SuspectsAreaBlip.IsRouteEnabled = true;
+            if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 201f)
+            {
+                Game.DisplayHelp("You are too close too the area, aborting callout.");
+                Game.LogTrivial("Too close to callout area when accepting, aborting.");
+                return false;
+            }
             return base.OnCalloutAccepted();
         }
 
@@ -84,6 +93,7 @@ namespace GangRaids.Callouts
                 if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 200f)
                 {
                     SuspectsAreaBlip.DisableRoute();
+                    Functions.PlayScannerAudio("OFFICERS_REPORT SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " PROCEED_WITH_CAUTION");
                     DrugDealState = EDrugDealState.InPreparation;
                 }
             }
@@ -117,9 +127,9 @@ namespace GangRaids.Callouts
             {
                 PlayerEndPointBlip = new Blip(PlayerEndPosition);
                 PlayerEndPointBlip.Color = System.Drawing.Color.Purple;
-                                foreach (var veh in Scenario.CopCarDict.Keys)
+                foreach (var veh in Scenario.CopCarDict.Keys)
                 {
-                    veh.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[veh].endPoint.Position, 12f, VehicleDrivingFlags.Emergency, 1f);
+                    veh.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[veh].endPoint.Position, 10f, VehicleDrivingFlags.Emergency, 5f);
                 }
                 IsWaitTimeOver = false;
                 GameFiber.StartNew(delegate
@@ -135,7 +145,7 @@ namespace GangRaids.Callouts
             if (DrugDealState == EDrugDealState.Waiting)
             {
                 Game.DisplayHelp("Go get ~y~them~w~!");
-                if (IsWaitTimeOver || Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 40f)
+                if (IsWaitTimeOver || Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 25f)
                 {
                     foreach (var veh in Scenario.CopCarDict.Keys)
                     {
@@ -183,15 +193,17 @@ namespace GangRaids.Callouts
                 {
                     MakeDealer3DoStuff();
                 }
-                if (!(Functions.GetPursuitPeds(Pursuit) == null) && !(Functions.GetPursuitPeds(Pursuit).Length == 0))
+                if (!(Functions.GetPursuitPeds(Pursuit) == null) && !(Functions.GetPursuitPeds(Pursuit).Length == 0) )
                 {
                     Functions.SetPursuitIsActiveForPlayer(Pursuit, true);
                     foreach (var cop in Scenario.CopList1)
                     {
+                        cop.Dismiss();
                         Functions.AddCopToPursuit(Pursuit, cop);
                     }
                     foreach (var cop in Scenario.CopList2)
                     {
+                        cop.Dismiss();
                         Functions.AddCopToPursuit(Pursuit, cop);
                     }
                 }
@@ -206,21 +218,43 @@ namespace GangRaids.Callouts
                         cop.Tasks.FightAgainstClosestHatedTarget(150f);
                     }
                 }
-                DrugDealState = EDrugDealState.CanBeEnded;
+                DrugDealState = EDrugDealState.PlayingLogic;
+            }
+
+
+            if (DrugDealState == EDrugDealState.PlayingLogic)
+            {
+                if (firstloop)
+                {
+                    firstloop = false;
+                    GameFiber.StartNew(delegate
+                    {
+                        Game.LogTrivial("Waiting 10 s to allow the callout logic to play out.");
+                        GameFiber.Wait(10000);
+                        Game.LogTrivial("Waited 10 s, allowing the callout to be ended.");
+                        DrugDealState = EDrugDealState.CanBeEnded;
+                        return;
+                    });
+                }
+                CleanUp();
             }
 
 
             if (DrugDealState == EDrugDealState.CanBeEnded)
             {
-                CleanUpBlips();
-                if (HasAnyPedBeenAddedToPursuit && !Functions.IsPursuitStillRunning(Pursuit))
+                CleanUp();
+                if (Game.LocalPlayer.Character.IsDead)
                 {
-                    Game.LogTrivial("Pursuit is not running any more, ending.");
                     End();
                 }
-                else if (HasAnyPedBeenAddedToPursuit && (Functions.GetActivePursuit() == null))
+                if (HasAnyPedBeenAddedToPursuit && !Functions.IsPursuitStillRunning(Pursuit) && (FighterList.Count == 0))
                 {
-                    Game.LogTrivial("Player left pursuit, ending.");
+                    Game.LogTrivial("Pursuit is not running any more and nobody's still fighting, ending callout.");
+                    End();
+                }
+                else if (HasAnyPedBeenAddedToPursuit && (Functions.GetActivePursuit() == null) && (FighterList.Count == 0))
+                {
+                    Game.LogTrivial("Player left pursuit and nobody's still fighting, ending callout.");
                     End();
                 }
                 else if (!HasAnyPedBeenAddedToPursuit && !IsAnySuspectStillAliveAndNotArrested())
@@ -259,70 +293,73 @@ namespace GangRaids.Callouts
                     }
                 }
             }
-            if (!(Scenario.DealerList == null))
+            if(!(Scenario == null))
             {
-                foreach (var dealer in Scenario.DealerList)
+                if (!(Scenario.DealerList == null))
                 {
-                    if (dealer.Exists())
+                    foreach (var dealer in Scenario.DealerList)
                     {
-                        dealer.Dismiss();
-                    }
-                }
-            }
-            if (!(Scenario.BuyerList == null))
-            {
-                foreach (var Buyer in Scenario.BuyerList)
-                {
-                    if (Buyer.Exists())
-                    {
-                        Buyer.Dismiss();
-                    }
-                }
-            }
-            if (!(Scenario.CopList1 == null))
-            {
-                foreach (var Cop in Scenario.CopList1)
-                {
-                    if (Cop.Exists())
-                    {
-                        Cop.Dismiss();
-                    }
-                }
-            }
-            if (!(Scenario.CopList2 == null))
-            {
-                foreach (var Cop in Scenario.CopList2)
-                {
-                    if (Cop.Exists())
-                    {
-                        Cop.Dismiss();
-                    }
-                }
-            }
-            if (!(Scenario.BadBoyCarList == null))
-            {
-                foreach (var veh in Scenario.BadBoyCarList)
-                {
-                    if (veh.Exists())
-                    {
-                        veh.Dismiss();
-                    }
-                }
-            }
-            if (!(Scenario.CopCarDict == null))
-            {
-                foreach (var veh in Scenario.CopCarDict.Keys)
-                {
-                    foreach (var cop in veh.Occupants)
-                    {
-                        if (cop.Exists())
+                        if (dealer.Exists())
                         {
-                            cop.Dismiss();
+                            dealer.Dismiss();
                         }
                     }
-                    if (veh.Exists())
+                }
+                if (!(Scenario.BuyerList == null))
+                {
+                    foreach (var Buyer in Scenario.BuyerList)
                     {
-                        veh.Dismiss();
+                        if (Buyer.Exists())
+                        {
+                            Buyer.Dismiss();
+                        }
+                    }
+                }
+                if (!(Scenario.CopList1 == null))
+                {
+                    foreach (var Cop in Scenario.CopList1)
+                    {
+                        if (Cop.Exists())
+                        {
+                            Cop.Dismiss();
+                        }
+                    }
+                }
+                if (!(Scenario.CopList2 == null))
+                {
+                    foreach (var Cop in Scenario.CopList2)
+                    {
+                        if (Cop.Exists())
+                        {
+                            Cop.Dismiss();
+                        }
+                    }
+                }
+                if (!(Scenario.BadBoyCarList == null))
+                {
+                    foreach (var veh in Scenario.BadBoyCarList)
+                    {
+                        if (veh.Exists())
+                        {
+                            veh.Dismiss();
+                        }
+                    }
+                }
+                if (!(Scenario.CopCarDict == null))
+                {
+                    foreach (var veh in Scenario.CopCarDict.Keys)
+                    {
+                        foreach (var cop in veh.Occupants)
+                        {
+                            if (cop.Exists())
+                            {
+                                cop.Dismiss();
+                            }
+                        }
+                        if (veh.Exists())
+                        {
+                            veh.Dismiss();
+                        }
                     }
                 }
             }
@@ -332,7 +369,7 @@ namespace GangRaids.Callouts
 
         public enum EDrugDealState
         {
-            Accepted, InPreparation, EngagingSuspects, CanBeEnded, Arrived, Waiting
+            Accepted, InPreparation, EngagingSuspects, CanBeEnded, Arrived, Waiting, PlayingLogic
         }
 
 
@@ -354,8 +391,7 @@ namespace GangRaids.Callouts
                     if (Scenario.Dealer2.IsInAnyVehicle(true))
                     {
                         Game.LogTrivial("Dealer2 made it into van, adding to pursuit.");
-                        HasAnyPedBeenAddedToPursuit = true;
-                        Functions.AddPedToPursuit(Pursuit, Scenario.Dealer2);
+                        AddToPursuitAndDismiss(Scenario.Dealer2);
                     }
                     else
                     {
@@ -375,8 +411,7 @@ namespace GangRaids.Callouts
                 else
                 {
                     Game.LogTrivial("Decided to make Dealer2 run away, adding to pursuit.");
-                    HasAnyPedBeenAddedToPursuit = true;
-                    Functions.AddPedToPursuit(Pursuit, Scenario.Dealer2);
+                    AddToPursuitAndDismiss(Scenario.Dealer2);
                 }
             }
         }
@@ -387,11 +422,10 @@ namespace GangRaids.Callouts
             if (Scenario.Dealer1.IsInAnyVehicle(false))
             {
                 Game.LogTrivial("Dealer1 is in car.");
-                if (UsefulExtensions.Decide(70))
+                if (UsefulExtensions.Decide(50))
                 {
                     Game.LogTrivial("Decided to make Dealer1 flee in car, adding to pursuit");
-                    HasAnyPedBeenAddedToPursuit = true;
-                    Functions.AddPedToPursuit(Pursuit, Scenario.Dealer1);
+                    AddToPursuitAndDismiss(Scenario.Dealer1);
                 }
                 else
                 {
@@ -402,7 +436,7 @@ namespace GangRaids.Callouts
             else
             {
                 Game.LogTrivial("Dealer1 is NOT in car.");
-                if (UsefulExtensions.Decide(60))
+                if (UsefulExtensions.Decide(40))
                 {
                     Game.LogTrivial("Decided to make Dealer1 try to enter car.");
                     GameFiber.StartNew(delegate
@@ -418,8 +452,7 @@ namespace GangRaids.Callouts
                         if (Scenario.Dealer1.IsInAnyVehicle(true))
                         {
                             Game.LogTrivial("Dealer1 made it into car, adding to pursuit.");
-                            HasAnyPedBeenAddedToPursuit = true;
-                            Functions.AddPedToPursuit(Pursuit, Scenario.Dealer1);
+                            AddToPursuitAndDismiss(Scenario.Dealer1);
                         }
                         else
                         {
@@ -449,7 +482,7 @@ namespace GangRaids.Callouts
         {
             if (Buyer2IsFightingStraightAway)
             {
-                if (UsefulExtensions.Decide(70))
+                if (UsefulExtensions.Decide(80))
                 {
                     Game.LogTrivial("Decided to make Buyer1 join Buyer2 in combat");
                     MakeFightAndCreateBlip(Scenario.Buyer1, Buyer1Blip);
@@ -471,7 +504,7 @@ namespace GangRaids.Callouts
                         {
                             Game.LogTrivial("Buyer1 made it into car, adding to pursuit.");
                             HasAnyPedBeenAddedToPursuit = true;
-                            Functions.AddPedToPursuit(Pursuit, Scenario.Buyer1);
+                            AddToPursuitAndDismiss(Scenario.Buyer1);
                         }
                         else
                         {
@@ -516,13 +549,13 @@ namespace GangRaids.Callouts
                                     GameFiber.Yield();
                                 }
                                 Game.LogTrivial("Buyer1's driver died.");
-                                if (UsefulExtensions.Decide(50))
+                                if (UsefulExtensions.Decide(30))
                                 {
                                     Game.LogTrivial("Decided to make Buyer1 flee.");
                                     if (HasAnyPedBeenAddedToPursuit && Functions.IsPursuitStillRunning(Pursuit))
                                     {
                                         Game.LogTrivial("Pursuit is still active, adding Buyer1.");
-                                        Functions.AddPedToPursuit(Pursuit, Scenario.Buyer1);
+                                        AddToPursuitAndDismiss(Scenario.Buyer1);
                                     }
                                     else
                                     {
@@ -543,8 +576,7 @@ namespace GangRaids.Callouts
                             {
                                 Game.LogTrivial("Pursuit is active, making Buyer1 shuffle to drivers seat and adding him to pursuit.");
                                 Scenario.Buyer1.Tasks.ShuffleToAdjacentSeat().WaitForCompletion();
-                                Functions.AddPedToPursuit(Pursuit, Scenario.Buyer1);
-                                HasAnyPedBeenAddedToPursuit = true;
+                                AddToPursuitAndDismiss(Scenario.Buyer1);
                             }
                             else
                             {
@@ -574,7 +606,7 @@ namespace GangRaids.Callouts
             }
             else
             {
-                if (UsefulExtensions.Decide(70))
+                if (UsefulExtensions.Decide(50))
                 {
                     Game.LogTrivial("Decided to make Buyer2 try to enter car.");
                     GameFiber.StartNew(delegate
@@ -590,7 +622,7 @@ namespace GangRaids.Callouts
                         if (Scenario.Buyer2.IsInAnyVehicle(true))
                         {
                             Game.LogTrivial("Buyer2 made it to car, adding to pursuit.");
-                            Functions.AddPedToPursuit(Pursuit, Scenario.Buyer2);
+                            AddToPursuitAndDismiss(Scenario.Buyer2);
                         }
                         else
                         {
@@ -610,7 +642,7 @@ namespace GangRaids.Callouts
         }
 
 
-        private void CleanUpBlips()
+        private void CleanUp()
         {
 
             foreach(var pedblip in PedBlipDict)
@@ -621,16 +653,33 @@ namespace GangRaids.Callouts
                     pedblip.Value.Delete();
                 }
             }
+            var newList = new List<Ped> { };
+            foreach(var fighter in FighterList)
+            {
+                if (fighter.Exists() && !fighter.IsDead && !Functions.IsPedArrested(fighter))
+                {
+                    newList.Add(fighter);
+                }
+            }
+            FighterList = newList;
         }
 
 
         private void MakeFightAndCreateBlip(Ped ped, Blip blip)
         {
             ped.Tasks.FightAgainstClosestHatedTarget(100f);
+            FighterList.Add(ped);
             blip = new Blip(ped);
             blip.Color = System.Drawing.Color.Red;
             blip.Scale = 0.75f;
             PedBlipDict.Add(ped, blip);
+        }
+
+        private void AddToPursuitAndDismiss(Ped ped)
+        {
+            ped.Dismiss();
+            Functions.AddPedToPursuit(Pursuit, ped);
+            HasAnyPedBeenAddedToPursuit = true;
         }
 
 

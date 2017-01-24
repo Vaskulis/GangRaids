@@ -228,8 +228,8 @@ namespace GangRaids.Menus
         private static void MakeCopCarListItems()
         {
             SelectedCopcarWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) { return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index); });
-            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, 0);
-            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, 0);
+            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count - 1));
+            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count - 1));
             SelectedCopCar1Build = DrugDeal.Scenario.CopCarBuildList.Find(delegate (CopCarBuild ccb)
             {
                 return ccb.carName == copCar1ListItem.IndexToItem(copCar1ListItem.Index);
