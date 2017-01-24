@@ -7,6 +7,7 @@ using Rage;
 using Rage.Native;
 using LSPD_First_Response.Mod.API;
 using LSPD_First_Response.Mod.Callouts;
+using GangRaids.Scenarios;
 
 namespace GangRaids.HelperClasses
 {
@@ -22,11 +23,11 @@ namespace GangRaids.HelperClasses
 
         public DrugDealScenarioScheme
             (
-            string Name, 
-            List<CopCarWayPoint> CopCarWayPointList, 
-            List<CopCarBuild> CopCarBuildList, 
-            List<Pos4> BadGuyCarSpawnPos4List, 
-            List<Pos4> BadGuyPedSpawnPos4List, 
+            string Name,
+            List<CopCarWayPoint> CopCarWayPointList,
+            List<CopCarBuild> CopCarBuildList,
+            List<Pos4> BadGuyCarSpawnPos4List,
+            List<Pos4> BadGuyPedSpawnPos4List,
             Vector3 Position,
             int WaitTime
             )
@@ -40,7 +41,7 @@ namespace GangRaids.HelperClasses
             this.waitTime = WaitTime;
 
         }
-        
+
         public List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
         public List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
         public List<Pos4> BadGuyCarSpawnPos4List { get { return badGuyCarSpawnPos4List; } }
@@ -48,5 +49,27 @@ namespace GangRaids.HelperClasses
         public string Name { get { return name; } }
         public Vector3 Position { get { return position; } }
         public int WaitTime { get { return waitTime; } }
+
+
+        public static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme )
+        {
+            var playerPos = Game.LocalPlayer.Character.Position;
+            var schemeList = DrugDealScenarioSchemes.ScenarioSchemeList;
+            schemeList.Shuffle();
+            scenarioScheme = null;
+            var foundOne = false;
+            foreach (var item in schemeList)
+            {
+                if ((playerPos.DistanceTo(item.Position) < 1500f) && (playerPos.DistanceTo(item.Position) > 300f))
+                {
+                    scenarioScheme = item;
+                    foundOne = true;
+                    Game.LogTrivial(string.Format("Chose Scenario: {0}", item.Name));
+                    break;
+                }
+            }
+            return foundOne;
+
+        }
     }
 }

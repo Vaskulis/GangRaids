@@ -15,7 +15,7 @@ namespace GangRaids.Menus
 {
     class DrugDealMenu
     {
-        private static UIMenu DrugDealMenuPositionMenu;
+        private static UIMenu DrugDealPositionMenu;
         private static UIMenuListItem copCar1ListItem;
         private static UIMenuListItem copCar2ListItem;
         private static UIMenuListItem insertionPointListItem;
@@ -23,13 +23,12 @@ namespace GangRaids.Menus
         private static List<CopCarWayPoint> spawnPoints;
         private static bool IsDrugDealMenuActive = false;
 
-        private static UIMenuItem confirmItem;
-
         private static List<dynamic> CopCarBuildNameList;
 
-        private static List<CopCarWayPoint> SelectedWaypointList;
+        private static List<CopCarWayPoint> SelectedCopcarWaypointList;
         private static CopCarBuild SelectedCopCar1Build;
         private static CopCarBuild SelectedCopCar2Build;
+        private static CopCarWayPoint SelectedPlayerWaypoint;
 
         private static MenuPool _menuPool;
 
@@ -41,18 +40,18 @@ namespace GangRaids.Menus
 
                 _menuPool = new MenuPool();
 
-                DrugDealMenuPositionMenu = new UIMenu("Gang Raids", "~b~Drug Deal Menu");
-                DrugDealMenuPositionMenu.SetKey(Common.MenuControls.Up, Keys.W);
-                DrugDealMenuPositionMenu.SetKey(Common.MenuControls.Down, Keys.S);
-                DrugDealMenuPositionMenu.SetKey(Common.MenuControls.Left, Keys.A);
-                DrugDealMenuPositionMenu.SetKey(Common.MenuControls.Right, Keys.D);
+                DrugDealPositionMenu = new UIMenu("Gang Raids", "~b~Drug Deal Menu");
+                DrugDealPositionMenu.SetKey(Common.MenuControls.Up, Keys.W);
+                DrugDealPositionMenu.SetKey(Common.MenuControls.Down, Keys.S);
+                DrugDealPositionMenu.SetKey(Common.MenuControls.Left, Keys.A);
+                DrugDealPositionMenu.SetKey(Common.MenuControls.Right, Keys.D);
 
-                DrugDealMenuPositionMenu.OnListChange += OnListChange;
-                DrugDealMenuPositionMenu.OnItemSelect += OnItemSelect;
+                DrugDealPositionMenu.OnListChange += OnListChange;
+                DrugDealPositionMenu.OnMenuClose += OnMenuClose;
 
                 while (true)
                 {
-                    if (DrugDeal.IsCurrentlyRunning && (DrugDeal.DrugDealState == DrugDeal.EDrugDealState.Accepted) && !IsDrugDealMenuActive)
+                    if (DrugDeal.IsCurrentlyRunning && (DrugDeal.DrugDealState == DrugDeal.EDrugDealState.InPreparation) && !IsDrugDealMenuActive)
                     {
                         CopCarBuildNameList = new List<dynamic> { };
                         foreach(var item in DrugDeal.Scenario.CopCarBuildList)
@@ -60,23 +59,27 @@ namespace GangRaids.Menus
                             CopCarBuildNameList.Add(item.carName);
                         }
 
-                        confirmItem = new UIMenuItem("Confirm", "Press this when you are ready!");
                         MakeInsertionPointListItem();
-                        CreateInsertionPointBlip();
                         MakeCopCarListItems();
+                        CreateBlips();
 
-                        DrugDealMenuPositionMenu.AddItem(confirmItem);
-                        DrugDealMenuPositionMenu.RefreshIndex();
+                        DrugDeal.Scenario.CopCar1 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedCopcarWaypointList[0], SelectedCopCar1Build);
+                        DrugDeal.Scenario.CopCar2 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedCopcarWaypointList[1], SelectedCopCar2Build);
+                        DrugDeal.Scenario.CopCarDict = DrugDeal.Scenario.MakeCopCarDict(SelectedCopcarWaypointList[0], SelectedCopcarWaypointList[1]);
+                        DrugDeal.Scenario.CopList1 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar1);
+                        DrugDeal.Scenario.CopList2 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar2);
 
-                        _menuPool.Add(DrugDealMenuPositionMenu);
+                        DrugDealPositionMenu.RefreshIndex();
+
+                        _menuPool.Add(DrugDealPositionMenu);
 
                         IsDrugDealMenuActive = !IsDrugDealMenuActive;
                     }
-                    else if (DrugDeal.IsCurrentlyRunning && !(DrugDeal.DrugDealState == DrugDeal.EDrugDealState.Accepted) && IsDrugDealMenuActive)
+                    else if (DrugDeal.IsCurrentlyRunning && !(DrugDeal.DrugDealState == DrugDeal.EDrugDealState.InPreparation) && IsDrugDealMenuActive)
                     {
-                        DrugDealMenuPositionMenu.Visible = false;
-                        DrugDealMenuPositionMenu.MenuItems.Clear();
-                        _menuPool.Remove(DrugDealMenuPositionMenu);
+                        DrugDealPositionMenu.Visible = false;
+                        DrugDealPositionMenu.MenuItems.Clear();
+                        _menuPool.Remove(DrugDealPositionMenu);
                         IsDrugDealMenuActive = !IsDrugDealMenuActive;
                     }
                     GameFiber.Yield();
@@ -90,7 +93,7 @@ namespace GangRaids.Menus
             {
                 if (IsDrugDealMenuActive)
                 {
-                    DrugDealMenuPositionMenu.Visible = !DrugDealMenuPositionMenu.Visible;
+                    DrugDealPositionMenu.Visible = !DrugDealPositionMenu.Visible;
                 }
             }
             _menuPool.ProcessMenus();
@@ -98,26 +101,26 @@ namespace GangRaids.Menus
 
         private static void OnListChange(UIMenu sender, UIMenuItem selectedItem, int index)
         {
-            if (sender == DrugDealMenuPositionMenu)
+            if (sender == DrugDealPositionMenu)
             {
                 if (selectedItem == insertionPointListItem)
                 {
-                    var waypoint = spawnPoints.Find(delegate (CopCarWayPoint ccwp)
+                    SelectedPlayerWaypoint = spawnPoints.Find(delegate (CopCarWayPoint ccwp)
                     {
-                        return ccwp.description == insertionPointListItem.IndexToItem(insertionPointListItem.Index); //Finds the CopCarWayPoint with the description that is currently displayed 
+                        return ccwp.description == insertionPointListItem.IndexToItem(insertionPointListItem.Index);
                     });
 
-                    DrugDeal.SpawnPointBlip.IsRouteEnabled = false;
-                    DrugDeal.SpawnPointBlip.Position = waypoint.startPoint.Position;
-                    DrugDeal.SpawnPointBlip.IsRouteEnabled = true;
+                    DrugDeal.PlayerStartPointBlip.IsRouteEnabled = false;
+                    DrugDeal.PlayerStartPointBlip.Position = SelectedPlayerWaypoint.startPoint.Position;
+                    DrugDeal.PlayerStartPointBlip.IsRouteEnabled = true;
 
-                    SelectedWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) 
+                    SelectedCopcarWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) 
                     {
                         return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index);
                     });
 
-                    copCar1ListItem.Text = string.Format("Car 1: {0}", SelectedWaypointList[0].description);
-                    copCar2ListItem.Text = string.Format("Car 2: {0}", SelectedWaypointList[1].description);
+                    copCar1ListItem.Text = string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description);
+                    copCar2ListItem.Text = string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description);
                 }
 
                 if (selectedItem == copCar1ListItem)
@@ -143,26 +146,47 @@ namespace GangRaids.Menus
             };
         }
 
-
-        private static void OnItemSelect(UIMenu sender, UIMenuItem selectedItem, int index)
+        private static void OnMenuClose(UIMenu sender)
         {
-            if (sender == DrugDealMenuPositionMenu)
+            if (sender == DrugDealPositionMenu)
             {
-                if (selectedItem == confirmItem)
+                GameFiber.StartNew(delegate
                 {
-                    GameFiber.StartNew(delegate
+                    foreach (var cop in DrugDeal.Scenario.CopList1)
                     {
-                        DrugDeal.Scenario.CopCar1 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedWaypointList[0], SelectedCopCar1Build);
-                        DrugDeal.Scenario.CopCar2 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedWaypointList[1], SelectedCopCar2Build);
-                        DrugDeal.Scenario.CopCarDict = DrugDeal.Scenario.MakeCopCarDict(SelectedWaypointList[0], SelectedWaypointList[1]);
-                        DrugDeal.Scenario.CopList1 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar1);
-                        DrugDeal.Scenario.CopList2 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar2);
+                        if (!(cop == null) && cop.Exists())
+                        {
+                            cop.Delete();
+                        }
+                    }
+                    foreach (var cop in DrugDeal.Scenario.CopList2)
+                    {
+                        if (!(cop == null) && cop.Exists())
+                        {
+                            cop.Delete();
+                        }
+                    }
+                    foreach (var car in DrugDeal.Scenario.CopCarDict.Keys)
+                    {
+                        if (!(car == null) && car.Exists())
+                        {
+                            car.Delete();
+                        }
+                    }
+                    DrugDeal.Scenario.CopCarDict.Clear();
+                    DrugDeal.Scenario.CopList1.Clear();
+                    DrugDeal.Scenario.CopList2.Clear();
 
-                        DrugDeal.PlayerStartPosition = DrugDeal.SpawnPointBlip.Position;
-                        DrugDeal.DrugDealState = DrugDeal.EDrugDealState.GettingInPosition;
-                        return;
-                    });
-                }
+                    DrugDeal.Scenario.CopCar1 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedCopcarWaypointList[0], SelectedCopCar1Build);
+                    DrugDeal.Scenario.CopCar2 = DrugDeal.Scenario.MakeCopCarDictVehicleAndOccupy(SelectedCopcarWaypointList[1], SelectedCopCar2Build);
+                    DrugDeal.Scenario.CopCarDict = DrugDeal.Scenario.MakeCopCarDict(SelectedCopcarWaypointList[0], SelectedCopcarWaypointList[1]);
+                    DrugDeal.Scenario.CopList1 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar1);
+                    DrugDeal.Scenario.CopList2 = DrugDeal.Scenario.MakeListOfOccupants(DrugDeal.Scenario.CopCar2);
+
+                    DrugDeal.PlayerStartPosition = SelectedPlayerWaypoint.startPoint.Position;
+                    DrugDeal.PlayerEndPosition = SelectedPlayerWaypoint.endPoint.Position;
+                    return;
+                });
             }
             else
             {
@@ -179,30 +203,33 @@ namespace GangRaids.Menus
             {
                 insertionPointDescriptionList.Add(spawnPoint.description);
             }
-            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, 0);
-            DrugDealMenuPositionMenu.AddItem(insertionPointListItem);
+            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, UsefulExtensions.rng.Next(3));
+            DrugDealPositionMenu.AddItem(insertionPointListItem);
         }
 
 
-        private static void CreateInsertionPointBlip()
+        private static void CreateBlips()
         {
-            var waypoint = spawnPoints.Find(delegate (CopCarWayPoint ccwp) 
+            SelectedPlayerWaypoint = spawnPoints.Find(delegate (CopCarWayPoint ccwp)
             {
                 return ccwp.description == insertionPointListItem.IndexToItem(insertionPointListItem.Index);
             });
 
-            DrugDeal.SpawnPointBlip = new Blip(waypoint.startPoint.Position);
-            DrugDeal.SpawnPointBlip.Color = System.Drawing.Color.Purple;
-            DrugDeal.SpawnPointBlip.RouteColor = System.Drawing.Color.Yellow;
-            DrugDeal.SpawnPointBlip.IsRouteEnabled = true;
+            DrugDeal.PlayerStartPointBlip = new Blip(SelectedPlayerWaypoint.startPoint.Position);
+            DrugDeal.PlayerStartPointBlip.Color = System.Drawing.Color.Purple;
+            DrugDeal.PlayerStartPointBlip.RouteColor = System.Drawing.Color.Yellow;
+            DrugDeal.PlayerStartPointBlip.IsRouteEnabled = true;
+
+            DrugDeal.PlayerStartPosition = SelectedPlayerWaypoint.startPoint.Position;
+            DrugDeal.PlayerEndPosition = SelectedPlayerWaypoint.endPoint.Position;
         }
 
 
         private static void MakeCopCarListItems()
         {
-            SelectedWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) { return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index); });
-            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedWaypointList[0].description), CopCarBuildNameList, 0);
-            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedWaypointList[1].description), CopCarBuildNameList, 0);
+            SelectedCopcarWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) { return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index); });
+            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, 0);
+            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, 0);
             SelectedCopCar1Build = DrugDeal.Scenario.CopCarBuildList.Find(delegate (CopCarBuild ccb)
             {
                 return ccb.carName == copCar1ListItem.IndexToItem(copCar1ListItem.Index);
@@ -211,8 +238,8 @@ namespace GangRaids.Menus
             {
                 return ccb.carName == copCar2ListItem.IndexToItem(copCar2ListItem.Index);
             });
-            DrugDealMenuPositionMenu.AddItem(copCar1ListItem);
-            DrugDealMenuPositionMenu.AddItem(copCar2ListItem);
+            DrugDealPositionMenu.AddItem(copCar1ListItem);
+            DrugDealPositionMenu.AddItem(copCar2ListItem);
         }       
     }
 }

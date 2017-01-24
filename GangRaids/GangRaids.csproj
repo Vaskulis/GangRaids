@@ -34,9 +34,6 @@
     <Reference Include="LSPD First Response">
       <HintPath>..\..\..\..\Dependencies\LSPD First Response.dll</HintPath>
     </Reference>
-    <Reference Include="PoliceSearch">
-      <HintPath>..\..\..\..\Dependencies\PoliceSearch.dll</HintPath>
-    </Reference>
     <Reference Include="RAGENativeUI">
       <HintPath>..\..\..\..\Dependencies\RAGENativeUI.dll</HintPath>
     </Reference>
@@ -57,7 +54,6 @@
   <ItemGroup>
     <Compile Include="Callouts\DrugDeal.cs" />
     <Compile Include="Callouts\PursuitCallout.cs" />
-    <Compile Include="Callouts\VehicleHasStuffInIt.cs" />
     <Compile Include="HelperClasses\CopCarBuild.cs" />
     <Compile Include="HelperClasses\CopCarWayPoint.cs" />
     <Compile Include="HelperClasses\DrugDealScenario.cs" />

@@ -182,6 +182,7 @@ namespace GangRaids.HelperClasses
 
         public Vehicle MakeCopCarDictVehicleAndOccupy(CopCarWayPoint waypoint, CopCarBuild build)
         {
+            Game.LogTrivial(string.Format("Player decided to spawn {0} at {1}.", build.carName, waypoint.description));
             var veh = waypoint.startPoint.CreateVehicle(build.carName);
             foreach(var seat in build.seatIndicesToOccupy)
             {
