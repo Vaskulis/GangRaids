@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using LSPD_First_Response.Mod.API;
 using System.Windows.Forms;
 using Rage;
@@ -10,6 +6,7 @@ using RAGENativeUI;
 using RAGENativeUI.Elements;
 using GangRaids.HelperClasses;
 using GangRaids.Callouts;
+using GangRaids.INIFile;
 
 namespace GangRaids.Menus
 {
@@ -32,7 +29,7 @@ namespace GangRaids.Menus
 
         private static MenuPool _menuPool;
 
-        public static void InitializeAndProcess()
+        internal static void InitializeAndProcess()
         {
             GameFiber.StartNew(delegate 
             {
@@ -89,11 +86,14 @@ namespace GangRaids.Menus
 
         private static void Process(object sender, GraphicsEventArgs e)
         {
-            if (Game.IsKeyDown(Keys.L) && !_menuPool.IsAnyMenuOpen())
+            if (IsDrugDealMenuActive)                
             {
-                if (IsDrugDealMenuActive)
+                if (!DrugDeal.PlayerIsInPosition && Game.IsKeyDown(INIReader.MenuKey) && !_menuPool.IsAnyMenuOpen())
                 {
-                    DrugDealPositionMenu.Visible = !DrugDealPositionMenu.Visible;
+                    if (Game.IsKeyDownRightNow(INIReader.MenuModifierKey) && !Functions.IsPoliceComputerActive())
+                    {
+                        DrugDealPositionMenu.Visible = !DrugDealPositionMenu.Visible;
+                    }
                 }
             }
             _menuPool.ProcessMenus();
@@ -185,6 +185,7 @@ namespace GangRaids.Menus
 
                     DrugDeal.PlayerStartPosition = SelectedPlayerWaypoint.startPoint.Position;
                     DrugDeal.PlayerEndPosition = SelectedPlayerWaypoint.endPoint.Position;
+                    DrugDeal.PlayerDirection = SelectedPlayerWaypoint.direction;
                     return;
                 });
             }
@@ -222,6 +223,7 @@ namespace GangRaids.Menus
 
             DrugDeal.PlayerStartPosition = SelectedPlayerWaypoint.startPoint.Position;
             DrugDeal.PlayerEndPosition = SelectedPlayerWaypoint.endPoint.Position;
+            DrugDeal.PlayerDirection = SelectedPlayerWaypoint.direction;
         }
 
 

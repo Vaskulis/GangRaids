@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace GangRaids.HelperClasses
 {
@@ -13,7 +9,7 @@ namespace GangRaids.HelperClasses
         private List<string> PedNameList;
         private Dictionary<string, List<string>> WeaponDict;
 
-        public CopCarBuild(string carName, List<string> pedNameList, Dictionary<string, List<string>> weaponDict, List<int> seatIndicesToOccupy)
+        internal CopCarBuild(string carName, List<string> pedNameList, Dictionary<string, List<string>> weaponDict, List<int> seatIndicesToOccupy)
         {
             this.CarName = carName;
             this.PedNameList = pedNameList;
@@ -21,9 +17,9 @@ namespace GangRaids.HelperClasses
             this.SeatIndicesToOccupy = seatIndicesToOccupy;
         }
         
-        public string carName { get { return CarName; } }
-        public List<int> seatIndicesToOccupy { get { return SeatIndicesToOccupy; } }
-        public List<string> pedNameList { get { return PedNameList; } }
-        public Dictionary<string, List<string>> weaponDict { get { return WeaponDict; } }
+        internal string carName { get { return CarName; } }
+        internal List<int> seatIndicesToOccupy { get { return SeatIndicesToOccupy; } }
+        internal List<string> pedNameList { get { return PedNameList; } }
+        internal Dictionary<string, List<string>> weaponDict { get { return WeaponDict; } }
     }
 }

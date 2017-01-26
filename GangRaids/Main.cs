@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LSPD_First_Response.Mod.Callouts;
-using LSPD_First_Response.Engine.Scripting.Entities;
-using LSPD_First_Response.Mod.API;
+﻿using LSPD_First_Response.Mod.API;
 using Rage;
 using GangRaids.Menus;
+using GangRaids.INIFile;
 
 [assembly: Rage.Attributes.Plugin("Gang Raids", Description = "Vaskulis' Gang Raids", Author = "Vaskulis")]
 
 namespace GangRaids
 {
-    public class Main : Plugin
+    internal class Main : Plugin
     {
         public override void Initialize()
         {
@@ -28,8 +22,11 @@ namespace GangRaids
         {
             if (OnDuty)
             {
-                RegisterCallouts();
-                DrugDealMenu.InitializeAndProcess();
+                if (INIReader.LoadINIFile())
+                {
+                    RegisterCallouts();
+                    DrugDealMenu.InitializeAndProcess();
+                }
             }
         }
         private static void RegisterCallouts()

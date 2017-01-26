@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Rage;
-using Rage.Native;
-using LSPD_First_Response.Mod.API;
-using LSPD_First_Response.Mod.Callouts;
 using GangRaids.Scenarios;
 
 namespace GangRaids.HelperClasses
@@ -21,7 +14,7 @@ namespace GangRaids.HelperClasses
         private List<Pos4> badGuyPedSpawnPos4List;
         private int waitTime;
 
-        public DrugDealScenarioScheme
+        internal DrugDealScenarioScheme
             (
             string Name,
             List<CopCarWayPoint> CopCarWayPointList,
@@ -42,16 +35,16 @@ namespace GangRaids.HelperClasses
 
         }
 
-        public List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
-        public List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
-        public List<Pos4> BadGuyCarSpawnPos4List { get { return badGuyCarSpawnPos4List; } }
-        public List<Pos4> BadGuyPedSpawnPos4List { get { return badGuyPedSpawnPos4List; } }
-        public string Name { get { return name; } }
-        public Vector3 Position { get { return position; } }
-        public int WaitTime { get { return waitTime; } }
+        internal List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
+        internal List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
+        internal List<Pos4> BadGuyCarSpawnPos4List { get { return badGuyCarSpawnPos4List; } }
+        internal List<Pos4> BadGuyPedSpawnPos4List { get { return badGuyPedSpawnPos4List; } }
+        internal string Name { get { return name; } }
+        internal Vector3 Position { get { return position; } }
+        internal int WaitTime { get { return waitTime; } }
 
 
-        public static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme )
+        internal static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme )
         {
             var playerPos = Game.LocalPlayer.Character.Position;
             var schemeList = DrugDealScenarioSchemes.ScenarioSchemeList;

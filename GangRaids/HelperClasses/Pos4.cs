@@ -5,24 +5,24 @@ using System.Globalization;
 
 namespace GangRaids.HelperClasses
 {
-    public class Pos4
+    internal class Pos4
     {
         private Vector4 posandheading;
 
 
-        public Pos4(float x, float y, float z, float head)
+        internal Pos4(float x, float y, float z, float head)
         {
             posandheading = new Vector4(x, y, z, head);
         }
 
 
-        public Pos4(Vector3 pos, float head)
+        internal Pos4(Vector3 pos, float head)
         {
             posandheading = new Vector4(pos, head);
         }
 
 
-        public Pos4(string[] strarray)
+        internal Pos4(string[] strarray)
         {
             if (strarray.Length != 4)
             {
@@ -43,17 +43,17 @@ namespace GangRaids.HelperClasses
         }
 
 
-        public Ped CreatePed(Model model)
+        internal Ped CreatePed(Model model)
         {
             return new Ped(model, this.Position, this.Heading);
         }
 
-        public Vehicle CreateVehicle(Model model)
+        internal Vehicle CreateVehicle(Model model)
         {
             return new Vehicle(model, this.Position, this.Heading);
         }
 
-        public Pos4 Copy()
+        internal Pos4 Copy()
         {
             var newPos4 = new Pos4(this.X, this.Y, this.Z, this.Heading);
             return newPos4;
@@ -61,35 +61,35 @@ namespace GangRaids.HelperClasses
 
         
 
-        public float X
+        internal float X
         {
             get { return posandheading.X; }
             set { posandheading.X = value; }
         }
 
 
-        public float Y
+        internal float Y
         {
             get { return posandheading.Y; }
             set { posandheading.Y = value; }
         }
 
 
-        public float Z
+        internal float Z
         {
             get { return posandheading.Z; }
             set { posandheading.Z = value; }
         }
 
 
-        public float Heading
+        internal float Heading
         {
             get { return posandheading.W; }
             set { posandheading.W = value; }
         }
 
 
-        public Vector3 Position
+        internal Vector3 Position
         {
             get { return new Vector3(posandheading.X, posandheading.Y, posandheading.Z); }
             set

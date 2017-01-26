@@ -12,16 +12,19 @@ namespace GangRaids.HelperClasses
         private string Description;
         private Pos4 StartPoint;
         private Pos4 EndPoint;
+        private string Direction;
 
-        public CopCarWayPoint(string description, Pos4 startPoint, Pos4 endPoint)
+        internal CopCarWayPoint(string description, Pos4 startPoint, Pos4 endPoint, string direction)
         {
             this.Description = description;
             this.StartPoint = startPoint;
             this.EndPoint = endPoint;
+            this.Direction = direction;
         }
 
-        public string description { get { return Description; } }
-        public Pos4 startPoint { get { return StartPoint; } }
-        public Pos4 endPoint { get { return EndPoint; } }
+        internal string description { get { return Description; } }
+        internal Pos4 startPoint { get { return StartPoint; } }
+        internal Pos4 endPoint { get { return EndPoint; } }
+        internal string direction { get { return Direction; } }
     }
 }

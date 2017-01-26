@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using GangRaids.HelperClasses;
 using Rage;
 
@@ -10,14 +6,14 @@ namespace GangRaids.Scenarios
 {
     class DrugDealScenarioSchemes
     {
-        public static DrugDealScenarioScheme Scenario1 = new DrugDealScenarioScheme
+        internal static DrugDealScenarioScheme Scenario1 = new DrugDealScenarioScheme
         (
             "Scenario1",
             new List<CopCarWayPoint>
             {
-                new CopCarWayPoint("W - Popular St", new Pos4(796.9736f, -1056.078f, 26.79304f, 6.348056f), new Pos4(829.3022f, -1044.76f, 26.9541f, 222.386f)),
-                new CopCarWayPoint("NE - Vespucci Blvd", new Pos4(885.6469f, -996.2393f, 32.01857f, 93.51751f), new Pos4(860.551f, -1024.535f, 29.65693f, 179.4727f)),
-                new CopCarWayPoint("SW - Supply St", new Pos4(811.8109f, -1091.278f, 28.0963f, 269.4472f), new Pos4(860.8483f, -1068.41f, 28.05779f, 359.7094f))
+                new CopCarWayPoint("W - Popular St", new Pos4(796.9736f, -1056.078f, 26.79304f, 6.348056f), new Pos4(829.3022f, -1044.76f, 26.9541f, 222.386f), "WEST"),
+                new CopCarWayPoint("NE - Vespucci Blvd", new Pos4(885.6469f, -996.2393f, 32.01857f, 93.51751f), new Pos4(860.551f, -1024.535f, 29.65693f, 179.4727f), "NORTH"),
+                new CopCarWayPoint("SW - Supply St", new Pos4(811.8109f, -1091.278f, 28.0963f, 269.4472f), new Pos4(860.8483f, -1068.41f, 28.05779f, 359.7094f), "SOUTH")
             },
             new List<CopCarBuild>
             {
@@ -44,14 +40,14 @@ namespace GangRaids.Scenarios
             9400
         );
 
-        public static DrugDealScenarioScheme Scenario2 = new DrugDealScenarioScheme
+        internal static DrugDealScenarioScheme Scenario2 = new DrugDealScenarioScheme
         (
             "Scenario2",
             new List<CopCarWayPoint>
             {
-                        new CopCarWayPoint("NE - Carson Ave", new Pos4(306.75f, -1918.413f, 25.37817f, 142.7733f), new Pos4(262.7377f, -1964.95f, 22.31196f, 140.8337f)),
-                        new CopCarWayPoint("SE - Jamestown St", new Pos4(296.4449f, -1995.007f, 20.25746f, 145.2198f), new Pos4(254.7816f, -1992.251f, 19.77044f, 55.70863f)),
-                        new CopCarWayPoint("SW - Dutch London St", new Pos4(209.1329f, -2030.292f, 17.8418f, 328.9295f), new Pos4(243.2737f, -1993.599f, 19.48059f, 324.3007f))
+                        new CopCarWayPoint("NE - Carson Ave", new Pos4(306.75f, -1918.413f, 25.37817f, 142.7733f), new Pos4(262.7377f, -1964.95f, 22.31196f, 140.8337f), "NORTH"),
+                        new CopCarWayPoint("SE - Jamestown St", new Pos4(296.4449f, -1995.007f, 20.25746f, 145.2198f), new Pos4(254.7816f, -1992.251f, 19.77044f, 55.70863f), "EAST"),
+                        new CopCarWayPoint("SW - Dutch London St", new Pos4(209.1329f, -2030.292f, 17.8418f, 328.9295f), new Pos4(243.2737f, -1993.599f, 19.48059f, 324.3007f), "SOUTH")
             },
             new List<CopCarBuild>
             {
@@ -78,14 +74,14 @@ namespace GangRaids.Scenarios
             7500
         );
 
-        public static DrugDealScenarioScheme Scenario3 = new DrugDealScenarioScheme
+        internal static DrugDealScenarioScheme Scenario3 = new DrugDealScenarioScheme
         (
             "Scenario3",
             new List<CopCarWayPoint>
             {
-                                new CopCarWayPoint("SE - Davis Ave", new Pos4(199.9875f, -1559.346f, 28.87995f, 38.28777f), new Pos4(160.4086f, -1517.683f, 28.75009f, 61.17656f)),
-                                new CopCarWayPoint("NW - Strawberry Ave", new Pos4(115.5835f, -1476.35f, 28.81214f, 229.6633f), new Pos4(146.7929f, -1498.214f, 28.74943f, 210.4924f)),
-                                new CopCarWayPoint("SW - Macdonald St", new Pos4(119.1578f, -1532.491f, 28.79548f, 322.5087f), new Pos4(139.1225f, -1509.266f, 28.74949f, 296.9163f))
+                                new CopCarWayPoint("SE - Davis Ave", new Pos4(199.9875f, -1559.346f, 28.87995f, 38.28777f), new Pos4(160.4086f, -1517.683f, 28.75009f, 61.17656f), "EAST"),
+                                new CopCarWayPoint("NW - Strawberry Ave", new Pos4(115.5835f, -1476.35f, 28.81214f, 229.6633f), new Pos4(146.7929f, -1498.214f, 28.74943f, 210.4924f), "WEST"),
+                                new CopCarWayPoint("SW - Macdonald St", new Pos4(119.1578f, -1532.491f, 28.79548f, 322.5087f), new Pos4(139.1225f, -1509.266f, 28.74949f, 296.9163f), "SOUTH")
             },
             new List<CopCarBuild>
             {
@@ -112,15 +108,50 @@ namespace GangRaids.Scenarios
             6000
         );
 
+        internal static DrugDealScenarioScheme Scenario4 = new DrugDealScenarioScheme
+        (
+            "Scenario4",
+            new List<CopCarWayPoint>
+            {
+                                        new CopCarWayPoint("S - Davis Ave", new Pos4(-219.9544f, -1723.483f, 32.33878f, 49.08244f), new Pos4(-240.4327f, -1673.807f, 33.09414f, 358.6898f), "SOUTH"),
+                                        new CopCarWayPoint("N - Carson Ave", new Pos4(-228.2108f, -1564.896f, 33.39318f, 143.45f), new Pos4(-240.6482f, -1624.891f, 33.16191f, 179.37f), "NORTH"),
+                                        new CopCarWayPoint("E - Forum Dr", new Pos4(-188.4228f, -1611.44f, 33.42591f, 181.3878f), new Pos4(-231.0156f, -1634.881f, 33.17455f, 96.69217f), "EAST")
+            },
+            new List<CopCarBuild>
+            {
+                                        CopCarsBuilds.police,
+                                        CopCarsBuilds.police2,
+                                        CopCarsBuilds.police3,
+                                        CopCarsBuilds.fbi2
+            },
+            new List<Pos4>
+            {
+                                        new Pos4(-243.8134f, -1654.289f, 33.3615f, 179.6201f),
+                                        new Pos4(-240.1096f, -1659.377f, 32.90593f, 357.9749f),
+                                        new Pos4(-240.4324f, -1644.087f, 33.05951f, 179.053f)
+            },
+            new List<Pos4>
+            {
+                                        new Pos4(-238.7602f, -1657.735f, 33.73918f, 0.6454393f),
+                                        new Pos4(-240.3228f, -1650.345f, 33.51057f, 357.401f),
+                                        new Pos4(-237.304f, -1654.311f, 34.05693f, 47.01286f),
+                                        new Pos4(-242.1824f, -1645.592f, 33.53774f, 192.4913f),
+                                        new Pos4(-240.0979f, -1647.766f, 33.53027f, 182.7434f),
+            },
+            new Vector3(-240.4324f, -1644.087f, 33.05951f),
+            9000
+        );
 
-        public static List<DrugDealScenarioScheme> ScenarioSchemeList = new List<DrugDealScenarioScheme>
+
+        internal static List<DrugDealScenarioScheme> ScenarioSchemeList = new List<DrugDealScenarioScheme>
         {
             Scenario1,
             Scenario2,
-            Scenario3
+            Scenario3,
+            Scenario4
         };
 
-        public static DrugDealScenario ChooseScenario()
+        internal static DrugDealScenario ChooseScenario()
         {
             return new DrugDealScenario(ScenarioSchemeList.RandomElement());
         }

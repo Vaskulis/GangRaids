@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Rage;
 using Rage.Native;
-using LSPD_First_Response.Mod.API;
-using LSPD_First_Response.Mod.Callouts;
 
 namespace GangRaids.HelperClasses
 {
@@ -26,8 +20,8 @@ namespace GangRaids.HelperClasses
         private Vehicle copCar1;
         private Vehicle copCar2;
 
-        private List<string> buyerCarStringList = new List<string> { "Emperor", "Primo", "Stanier", "Seminole", "Landstalker", "Cavalcade", "Granger", "Patriot", "Bison" };
-        private List<string> dealerCarStringList = new List<string> { "Buccaneer", "Tornado", "Manana", "Chino", "Dukes", "Stalion", "Phoenix", "Sabregt" };
+        private List<string> buyerCarStringList = new List<string> { "Emperor", "Primo", "Stanier", "Seminole", "Landstalker", "Cavalcade", "Bison" , "Oracle", "Asterope", "Fugitive", "Asea", "Ingot", "Premier", "Stratum", "Washington"};
+        private List<string> dealerCarStringList = new List<string> { "Buccaneer", "Tornado", "Manana", "Chino", "Dukes", "Stalion", "Phoenix", "Sabregt", "Vigero", "Peyote", "Ruiner", "Virgo" };
         private List<string> dealerVanStringList = new List<string> { "Speedo", "Burrito3", "Youga" };
         private Dictionary<List<string>, string> badBoyPedStringListDict = new Dictionary<List<string>, string>
         {
@@ -60,11 +54,10 @@ namespace GangRaids.HelperClasses
         private Ped buyer2;
         private Pos4 buyer2SpawnPos4;
         private bool dealer3WasSpawned;
-        private bool dealer3WasGivenBiggerGun;
 
         private string dealerGangNameString;
 
-        public DrugDealScenario(DrugDealScenarioScheme scheme)
+        internal DrugDealScenario(DrugDealScenarioScheme scheme)
         {
             this.name = Name;
             this.copCarBuildList = new List<CopCarBuild>(scheme.CopCarBuildList);
@@ -82,35 +75,34 @@ namespace GangRaids.HelperClasses
             this.copCarDict = new Dictionary<Vehicle, CopCarWayPoint> { };
             this.waitTime = scheme.WaitTime;
             dealer3WasSpawned = false;
-            dealer3WasGivenBiggerGun = false;
         }
 
-        public Vehicle BuyerCar { get { return buyerCar; } }
-        public Vehicle DealerCar { get { return dealerCar; } }
-        public Vehicle DealerVan { get { return dealerVan; } }
-        public List<Ped> DealerList { get { return dealerList; } }
-        public List<Ped> BuyerList { get { return buyerList; } }
-        public Vehicle CopCar1 { get { return copCar1; } set { copCar1 = value; } }
-        public Vehicle CopCar2 { get { return copCar2; } set { copCar2 = value; } }
-        public Dictionary<Vehicle, CopCarWayPoint> CopCarDict { get { return copCarDict; } set { copCarDict = value; } }
-        public List<Vehicle> BadBoyCarList { get { return badBoyCarList; } }
-        public string Name { get { return name; } }
-        public Vector3 Position { get { return position; } }
-        public Ped Dealer1 { get { return dealer1; } }
-        public Ped Dealer2 { get { return dealer2; } }
-        public Ped Dealer3 { get { return dealer3; } }
-        public Ped Buyer1 { get { return buyer1; } }
-        public Ped Buyer2 { get { return buyer2; } }
-        public List<Ped> CopList1 { get { return copList1; } set { copList1 = value; } }
-        public List<Ped> CopList2 { get { return copList2; } set { copList2 = value; } }
-        public int WaitTime { get { return waitTime; } }
-        public bool Dealer3WasSpawned { get { return dealer3WasSpawned; } }
-        public List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
-        public List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
-        public string DealerGangNameString { get { return dealerGangNameString; } }
+        internal Vehicle BuyerCar { get { return buyerCar; } }
+        internal Vehicle DealerCar { get { return dealerCar; } }
+        internal Vehicle DealerVan { get { return dealerVan; } }
+        internal List<Ped> DealerList { get { return dealerList; } }
+        internal List<Ped> BuyerList { get { return buyerList; } }
+        internal Vehicle CopCar1 { get { return copCar1; } set { copCar1 = value; } }
+        internal Vehicle CopCar2 { get { return copCar2; } set { copCar2 = value; } }
+        internal Dictionary<Vehicle, CopCarWayPoint> CopCarDict { get { return copCarDict; } set { copCarDict = value; } }
+        internal List<Vehicle> BadBoyCarList { get { return badBoyCarList; } }
+        internal string Name { get { return name; } }
+        internal Vector3 Position { get { return position; } }
+        internal Ped Dealer1 { get { return dealer1; } }
+        internal Ped Dealer2 { get { return dealer2; } }
+        internal Ped Dealer3 { get { return dealer3; } }
+        internal Ped Buyer1 { get { return buyer1; } }
+        internal Ped Buyer2 { get { return buyer2; } }
+        internal List<Ped> CopList1 { get { return copList1; } set { copList1 = value; } }
+        internal List<Ped> CopList2 { get { return copList2; } set { copList2 = value; } }
+        internal int WaitTime { get { return waitTime; } }
+        internal bool Dealer3WasSpawned { get { return dealer3WasSpawned; } }
+        internal List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
+        internal List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
+        internal string DealerGangNameString { get { return dealerGangNameString; } }
 
 
-        public void Initialize()
+        internal void Initialize()
         {
             GameFiber.StartNew(delegate 
             {
@@ -170,7 +162,7 @@ namespace GangRaids.HelperClasses
         }
 
 
-        public Dictionary<Vehicle, CopCarWayPoint> MakeCopCarDict(CopCarWayPoint WayPoint1, CopCarWayPoint WayPoint2)
+        internal Dictionary<Vehicle, CopCarWayPoint> MakeCopCarDict(CopCarWayPoint WayPoint1, CopCarWayPoint WayPoint2)
         {
             var Dict = new Dictionary<Vehicle, CopCarWayPoint> { };
             Dict.Add(copCar1, WayPoint1);
@@ -183,9 +175,9 @@ namespace GangRaids.HelperClasses
         }
 
 
-        public Vehicle MakeCopCarDictVehicleAndOccupy(CopCarWayPoint waypoint, CopCarBuild build)
+        internal Vehicle MakeCopCarDictVehicleAndOccupy(CopCarWayPoint waypoint, CopCarBuild build)
         {
-            Game.LogTrivial(string.Format("Player decided to spawn {0} at {1}.", build.carName, waypoint.description));
+            Game.LogTrivial(string.Format("Spawned {0} at {1}.", build.carName, waypoint.description));
             var veh = waypoint.startPoint.CreateVehicle(build.carName);
             foreach(var seat in build.seatIndicesToOccupy)
             {
@@ -234,7 +226,6 @@ namespace GangRaids.HelperClasses
                 {
                     dealer3.Inventory.GiveNewWeapon(badBoyBigGunList.RandomElement(), 999, true);
                     Game.LogTrivial("Decided to give dealer3 bigger gun.");
-                    dealer3WasGivenBiggerGun = true;
                 }
                 else { Game.LogTrivial("Decided NOT to give dealer3 bigger gun."); }
                 list.Add(dealer3);
@@ -272,7 +263,7 @@ namespace GangRaids.HelperClasses
             return list;
         }
 
-        public List<Ped> MakeListOfOccupants(Vehicle vehicle)
+        internal List<Ped> MakeListOfOccupants(Vehicle vehicle)
         {
             return new List<Ped>(vehicle.Occupants);
         }

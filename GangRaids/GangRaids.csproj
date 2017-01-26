@@ -53,20 +53,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Callouts\DrugDeal.cs" />
-    <Compile Include="Callouts\PursuitCallout.cs" />
     <Compile Include="HelperClasses\CopCarBuild.cs" />
     <Compile Include="HelperClasses\CopCarWayPoint.cs" />
     <Compile Include="HelperClasses\DrugDealScenario.cs" />
     <Compile Include="HelperClasses\DrugDealScenarioScheme.cs" />
     <Compile Include="HelperClasses\Pos4.cs" />
     <Compile Include="HelperClasses\UsefulExtensions.cs" />
+    <Compile Include="INIFile\INIReader.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\DrugDealMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenarios\CopCarBuilds.cs" />
     <Compile Include="Scenarios\DrugDealScenarioSchemes.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="INIFile\GangRaids.ini" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

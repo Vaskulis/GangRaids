@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using GangRaids.HelperClasses;
 
 namespace GangRaids.Scenarios
 {
     class CopCarsBuilds
     {
-        public static CopCarBuild police = new CopCarBuild
+        internal static CopCarBuild police = new CopCarBuild
         (
             "Police",
             new List<string>
@@ -24,7 +20,7 @@ namespace GangRaids.Scenarios
             new List<int> { -1, 0 }
         );
 
-        public static CopCarBuild police2 = new CopCarBuild
+        internal static CopCarBuild police2 = new CopCarBuild
         (
             "Police2",
             new List<string>
@@ -39,7 +35,7 @@ namespace GangRaids.Scenarios
             new List<int> { -1, 0 }
         );
 
-        public static CopCarBuild police3 = new CopCarBuild
+        internal static CopCarBuild police3 = new CopCarBuild
         (
             "Police3",
             new List<string>
@@ -54,7 +50,7 @@ namespace GangRaids.Scenarios
             new List<int> { -1, 0 }
         );
 
-        public static CopCarBuild fbi2 = new CopCarBuild
+        internal static CopCarBuild fbi2 = new CopCarBuild
         (
             "FBI2",
             new List<string>
