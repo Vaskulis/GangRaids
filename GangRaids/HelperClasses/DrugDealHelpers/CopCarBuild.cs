@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GangRaids.HelperClasses
+namespace GangRaids.HelperClasses.DrugDealHelpers
 {
     class CopCarBuild
     {

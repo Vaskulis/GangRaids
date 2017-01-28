@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using GangRaids.HelperClasses;
+using GangRaids.HelperClasses.DrugDealHelpers;
 using Rage;
 
-namespace GangRaids.Scenarios
+namespace GangRaids.Scenarios.DrugDealScenarios
 {
     class DrugDealScenarioSchemes
     {
@@ -36,8 +37,7 @@ namespace GangRaids.Scenarios
                 new Pos4(859.9125f, -1054.038f, 28.69007f, 34.79546f),
                 new Pos4(857.0261f, -1052.339f, 28.55039f, 17.43996f),
             },
-            new Vector3(859.6678f, -1057.579f, 28.01464f),
-            9400
+            new Vector3(859.6678f, -1057.579f, 28.01464f)
         );
 
         internal static DrugDealScenarioScheme Scenario2 = new DrugDealScenarioScheme
@@ -70,8 +70,7 @@ namespace GangRaids.Scenarios
                         new Pos4(253.0257f, -1974.011f, 21.86953f, 68.35076f),
                         new Pos4(250.177f, -1972.815f, 21.87804f, 86.93569f),
             },
-            new Vector3(251.9744f, -1976.815f, 21.21008f),
-            7500
+            new Vector3(251.9744f, -1976.815f, 21.21008f)
         );
 
         internal static DrugDealScenarioScheme Scenario3 = new DrugDealScenarioScheme
@@ -104,8 +103,7 @@ namespace GangRaids.Scenarios
                                 new Pos4(145.6923f, -1506.042f, 29.14162f, 194.7787f),
                                 new Pos4(146.7179f, -1509.394f, 29.14162f, 145.1558f),
             },
-            new Vector3(148.6301f, -1506.425f, 28.76328f),
-            6000
+            new Vector3(148.6301f, -1506.425f, 28.76328f)
         );
 
         internal static DrugDealScenarioScheme Scenario4 = new DrugDealScenarioScheme
@@ -138,9 +136,42 @@ namespace GangRaids.Scenarios
                                         new Pos4(-242.1824f, -1645.592f, 33.53774f, 192.4913f),
                                         new Pos4(-240.0979f, -1647.766f, 33.53027f, 182.7434f),
             },
-            new Vector3(-240.4324f, -1644.087f, 33.05951f),
-            9000
+            new Vector3(-240.4324f, -1644.087f, 33.05951f)
         );
+
+        internal static DrugDealScenarioScheme Scenario5 = new DrugDealScenarioScheme
+        (
+            "Scenario5",
+            new List<CopCarWayPoint>
+            {
+                        new CopCarWayPoint("E - Lowenstein Blvd", new Pos4(501.7538f, -1541.414f, 28.87946f, 136.1422f), new Pos4(463.6501f, -1525.564f, 28.87494f, 44.61883f), "EAST"),
+                        new CopCarWayPoint("S - Innocence Blvd", new Pos4(418.6312f, -1563.713f, 28.88379f, 324.8923f), new Pos4(453.9618f, -1526.611f, 28.67854f, 319.8857f), "SOUTH"),
+                        new CopCarWayPoint("N - Davis Ave", new Pos4(415.3104f, -1470.966f, 28.88953f, 298.9574f), new Pos4(440.3405f, -1504.599f, 28.89815f, 226.3646f), "NORTH")
+            },
+            new List<CopCarBuild>
+            {
+                        CopCarsBuilds.police,
+                        CopCarsBuilds.police2,
+                        CopCarsBuilds.police3,
+                        CopCarsBuilds.fbi2
+            },
+            new List<Pos4>
+            {
+                        new Pos4(456.6226f, -1508.514f, 28.79684f, 26.88555f),
+                        new Pos4(451.4465f, -1509.889f, 28.79695f, 231.8612f),
+                        new Pos4(459.4813f, -1516.511f, 28.8147f, 40.00843f)
+            },
+            new List<Pos4>
+            {
+                        new Pos4(454.3969f, -1510.776f, 29.2922f, 218.781f),
+                        new Pos4(458.2578f, -1511.595f, 29.29019f, 193.3457f),
+                        new Pos4(451.0422f, -1515.767f, 29.06611f, 292.471f),
+                        new Pos4(463.1635f, -1515.018f, 29.2865f, 58.98998f),
+                        new Pos4(459.371f, -1513.07f, 29.2896f, 32.47529f),
+            },
+            new Vector3(459.4813f, -1516.511f, 28.8147f)
+        );
+
 
 
         internal static List<DrugDealScenarioScheme> ScenarioSchemeList = new List<DrugDealScenarioScheme>
@@ -148,7 +179,8 @@ namespace GangRaids.Scenarios
             Scenario1,
             Scenario2,
             Scenario3,
-            Scenario4
+            Scenario4,
+            Scenario5
         };
 
         internal static DrugDealScenario ChooseScenario()

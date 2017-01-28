@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Rage;
-using GangRaids.Scenarios;
+using GangRaids.Scenarios.DrugDealScenarios;
 
-namespace GangRaids.HelperClasses
+namespace GangRaids.HelperClasses.DrugDealHelpers
 {
     class DrugDealScenarioScheme
     {
@@ -12,7 +12,6 @@ namespace GangRaids.HelperClasses
         private List<CopCarWayPoint> copCarWayPointList;
         private List<Pos4> badGuyCarSpawnPos4List;
         private List<Pos4> badGuyPedSpawnPos4List;
-        private int waitTime;
 
         internal DrugDealScenarioScheme
             (
@@ -21,8 +20,7 @@ namespace GangRaids.HelperClasses
             List<CopCarBuild> CopCarBuildList,
             List<Pos4> BadGuyCarSpawnPos4List,
             List<Pos4> BadGuyPedSpawnPos4List,
-            Vector3 Position,
-            int WaitTime
+            Vector3 Position
             )
         {
             this.name = Name;
@@ -31,7 +29,6 @@ namespace GangRaids.HelperClasses
             this.badGuyCarSpawnPos4List = BadGuyCarSpawnPos4List;
             this.badGuyPedSpawnPos4List = BadGuyPedSpawnPos4List;
             this.position = Position;
-            this.waitTime = WaitTime;
 
         }
 
@@ -41,7 +38,6 @@ namespace GangRaids.HelperClasses
         internal List<Pos4> BadGuyPedSpawnPos4List { get { return badGuyPedSpawnPos4List; } }
         internal string Name { get { return name; } }
         internal Vector3 Position { get { return position; } }
-        internal int WaitTime { get { return waitTime; } }
 
 
         internal static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme )

@@ -11,6 +11,8 @@ namespace GangRaids.INIFile
         internal static Keys MenuModifierKey;
         internal static string UnitName;
 
+        internal static bool RequestAirSupport;
+
         internal static bool LoadINIFile()
         {
             IniFile = new InitializationFile(@"Plugins/LSPDFR/GangRaids.ini");
@@ -23,6 +25,7 @@ namespace GangRaids.INIFile
             SetMenuKey();
             SetMenuModifierKey();
             SetUnitName();
+            SetDrugDealOptions();
             return true;
         }
 
@@ -82,6 +85,10 @@ namespace GangRaids.INIFile
             {
                 UnitName += ("BEAT_" + BeatString);
             }
+        }
+        private static void SetDrugDealOptions()
+        {
+            RequestAirSupport = IniFile.ReadBoolean("DRUGDEAL-CALLOUT", "RequestAirSupport", true);
         }
     }
 }

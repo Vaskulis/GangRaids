@@ -5,6 +5,7 @@ using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 using GangRaids.HelperClasses;
+using GangRaids.HelperClasses.DrugDealHelpers;
 using GangRaids.Callouts;
 using GangRaids.INIFile;
 
@@ -204,7 +205,7 @@ namespace GangRaids.Menus
             {
                 insertionPointDescriptionList.Add(spawnPoint.description);
             }
-            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, UsefulExtensions.rng.Next(3));
+            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, UsefulExtensions.rng.Next(insertionPointDescriptionList.Count));
             DrugDealPositionMenu.AddItem(insertionPointListItem);
         }
 
@@ -230,8 +231,8 @@ namespace GangRaids.Menus
         private static void MakeCopCarListItems()
         {
             SelectedCopcarWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) { return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index); });
-            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count - 1));
-            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count - 1));
+            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
+            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
             SelectedCopCar1Build = DrugDeal.Scenario.CopCarBuildList.Find(delegate (CopCarBuild ccb)
             {
                 return ccb.carName == copCar1ListItem.IndexToItem(copCar1ListItem.Index);

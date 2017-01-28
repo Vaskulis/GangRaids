@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Rage;
 
-namespace GangRaids.HelperClasses
+namespace GangRaids.HelperClasses.DrugDealHelpers
 {
     class CopCarWayPoint
     {

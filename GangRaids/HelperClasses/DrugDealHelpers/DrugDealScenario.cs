@@ -2,13 +2,12 @@
 using Rage;
 using Rage.Native;
 
-namespace GangRaids.HelperClasses
+namespace GangRaids.HelperClasses.DrugDealHelpers
 {
     class DrugDealScenario
     {
         private string name;
         private Vector3 position;
-        private int waitTime;
 
         private Vehicle buyerCar;
         private Pos4 buyerCarSpawnPos4;
@@ -56,6 +55,7 @@ namespace GangRaids.HelperClasses
         private bool dealer3WasSpawned;
 
         private string dealerGangNameString;
+        private string buyerGangNameString;
 
         internal DrugDealScenario(DrugDealScenarioScheme scheme)
         {
@@ -73,7 +73,6 @@ namespace GangRaids.HelperClasses
             this.position = scheme.Position.Copy();
             this.badBoyCarList = new List<Vehicle> { };
             this.copCarDict = new Dictionary<Vehicle, CopCarWayPoint> { };
-            this.waitTime = scheme.WaitTime;
             dealer3WasSpawned = false;
         }
 
@@ -95,11 +94,11 @@ namespace GangRaids.HelperClasses
         internal Ped Buyer2 { get { return buyer2; } }
         internal List<Ped> CopList1 { get { return copList1; } set { copList1 = value; } }
         internal List<Ped> CopList2 { get { return copList2; } set { copList2 = value; } }
-        internal int WaitTime { get { return waitTime; } }
         internal bool Dealer3WasSpawned { get { return dealer3WasSpawned; } }
         internal List<CopCarWayPoint> CopCarWayPointList { get { return copCarWayPointList; } }
         internal List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
         internal string DealerGangNameString { get { return dealerGangNameString; } }
+        internal string BuyerGangNameString { get { return buyerGangNameString; } }
 
 
         internal void Initialize()
@@ -245,6 +244,7 @@ namespace GangRaids.HelperClasses
         {
             var list = new List<Ped> { };
             var buyerPedStringKeyValuePair = badBoyPedStringListDict.RandomElement();
+            buyerGangNameString = buyerPedStringKeyValuePair.Value;
             buyer1 = buyer1SpawnPos4.CreatePed(buyerPedStringKeyValuePair.Key.RandomElement());
             buyer1.IsPersistent = true;
             buyer1.BlockPermanentEvents = true;
