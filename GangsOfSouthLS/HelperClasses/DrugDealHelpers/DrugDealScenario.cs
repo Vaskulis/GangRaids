@@ -106,7 +106,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         {
             GameFiber.StartNew(delegate 
             {
-                Game.LogTrivial(string.Format("Initializing {0}", name));
+                Game.LogTrivial(string.Format("[GangsOfSouthLS] Initializing {0}", name));
                 foreach (var entity in World.GetEntities(position, 100f, GetEntitiesFlags.ConsiderAllPeds | GetEntitiesFlags.ConsiderAllVehicles | GetEntitiesFlags.ExcludePlayerPed | GetEntitiesFlags.ExcludePlayerVehicle))
                 {
                     if (entity.Exists())
@@ -177,7 +177,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 
         internal Vehicle MakeCopCarDictVehicleAndOccupy(CopCarWayPoint waypoint, CopCarBuild build)
         {
-            Game.LogTrivial(string.Format("Spawned {0} at {1}.", build.carName, waypoint.description));
+            Game.LogTrivial(string.Format("[GangsOfSouthLS] Spawned {0} at {1}.", build.carName, waypoint.description));
             var veh = waypoint.startPoint.CreateVehicle(build.carName);
             foreach(var seat in build.seatIndicesToOccupy)
             {
@@ -218,22 +218,22 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
                 dealer3.RandomizeVariation();
                 dealer3.IsPersistent = true;
                 dealer3.BlockPermanentEvents = true;
-                Game.LogTrivial("Decided to spawn dealer3.");
+                Game.LogTrivial("[GangsOfSouthLS] Decided to spawn dealer3.");
                 if (UsefulExtensions.Decide(50))
                 {
                     dealer1.WarpIntoVehicle(dealerCar, -1);
-                    Game.LogTrivial("Decided to warp dealer1 into dealerCar.");
+                    Game.LogTrivial("[GangsOfSouthLS] Decided to warp dealer1 into dealerCar.");
                 }
-                else { Game.LogTrivial("Decided NOT to warp dealer1 into dealerCar."); }
+                else { Game.LogTrivial("[GangsOfSouthLS] Decided NOT to warp dealer1 into dealerCar."); }
                 if (UsefulExtensions.Decide(70))
                 {
                     dealer3.Inventory.GiveNewWeapon(badBoyBigGunList.RandomElement(), 999, true);
-                    Game.LogTrivial("Decided to give dealer3 bigger gun.");
+                    Game.LogTrivial("[GangsOfSouthLS] Decided to give dealer3 bigger gun.");
                 }
-                else { Game.LogTrivial("Decided NOT to give dealer3 bigger gun."); }
+                else { Game.LogTrivial("[GangsOfSouthLS] Decided NOT to give dealer3 bigger gun."); }
                 list.Add(dealer3);
             }
-            else { Game.LogTrivial("Decided NOT to spawn dealer3."); }
+            else { Game.LogTrivial("[GangsOfSouthLS] Decided NOT to spawn dealer3."); }
             foreach (var dealer in list)
             {
                 NativeFunction.Natives.SetPedCombatAbility(dealer, 2);
