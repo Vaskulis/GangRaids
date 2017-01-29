@@ -57,7 +57,7 @@ namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
         {
             GameFiber.StartNew(delegate
             {
-                Game.LogTrivial(string.Format("Initializing {0}", name));
+                Game.LogTrivial(string.Format("[GANG RAIDS] Initializing {0}", name));
                 foreach (var entity in World.GetEntities(position, 40f, GetEntitiesFlags.ConsiderAllPeds | GetEntitiesFlags.ExcludePlayerPed))
                 {
                     if (entity.Exists())
@@ -72,11 +72,15 @@ namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
                         entity.Delete();
                     }
                 }
-                MakeGangsterCar();
                 MakeMerchant();
-                MakeBadGuys();
                 return;
             });
+        }
+
+        internal void SpawnCarAndBadGuys()
+        {
+            MakeGangsterCar();
+            MakeBadGuys();
         }
 
         private void MakeGangsterCar()

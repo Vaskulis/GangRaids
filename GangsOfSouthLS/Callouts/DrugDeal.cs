@@ -697,7 +697,20 @@ namespace GangRaids.Callouts
                                 }
                                 if (Scenario.Buyer1.Exists() && Scenario.Buyer1.IsAlive)
                                 {
-                                    Game.LogTrivial("[GANG RAIDS] Buyer1's driver died.");
+                                    Game.LogTrivial("[GANG RAIDS] Buyer1's driver died or disappeared.");
+                                    GameFiber.Wait(200); //Allowing time for driver to despawn (if "suspect escaped")
+                                    if (!Scenario.Buyer2.Exists())
+                                    {
+                                        Game.LogTrivial("[GANG RAIDS] Buyer 2 doesn't exist any more (suspect escaped). Despawning Buyer1, too.");
+                                        if (Buyer1Blip.Exists())
+                                        {
+                                            Buyer1Blip.Delete();
+                                        }
+                                        if (Scenario.Buyer1.Exists())
+                                        {
+                                            Scenario.Buyer1.Delete();
+                                        }
+                                    }
                                     if (UsefulExtensions.Decide(30))
                                     {
                                         Game.LogTrivial("[GANG RAIDS] Decided to make Buyer1 flee.");
