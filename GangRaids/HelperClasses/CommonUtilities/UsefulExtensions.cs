@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Rage;
 
-namespace GangRaids.HelperClasses
+namespace GangRaids.HelperClasses.CommonUtilities
 {
     internal static class UsefulExtensions
     {

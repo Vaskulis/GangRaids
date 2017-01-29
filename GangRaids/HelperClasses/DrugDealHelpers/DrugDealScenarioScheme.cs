@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Rage;
 using GangRaids.Scenarios.DrugDealScenarios;
+using GangRaids.HelperClasses.CommonUtilities;
 
 namespace GangRaids.HelperClasses.DrugDealHelpers
 {
@@ -49,11 +50,11 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
             var foundOne = false;
             foreach (var item in schemeList)
             {
-                if ((playerPos.DistanceTo(item.Position) < 800f) && (playerPos.DistanceTo(item.Position) > 250f))
+                if ((playerPos.DistanceTo(item.Position) < 750f) && (playerPos.DistanceTo(item.Position) > 250f))
                 {
                     scenarioScheme = item;
                     foundOne = true;
-                    Game.LogTrivial(string.Format("Chose Scenario: {0}", item.Name));
+                    Game.LogTrivial(string.Format("[GANG RAIDS] Chose Scenario: {0}", item.Name));
                     break;
                 }
             }

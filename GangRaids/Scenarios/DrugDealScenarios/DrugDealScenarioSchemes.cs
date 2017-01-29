@@ -2,10 +2,11 @@
 using GangRaids.HelperClasses;
 using GangRaids.HelperClasses.DrugDealHelpers;
 using Rage;
+using GangRaids.HelperClasses.CommonUtilities;
 
 namespace GangRaids.Scenarios.DrugDealScenarios
 {
-    class DrugDealScenarioSchemes
+    static class DrugDealScenarioSchemes
     {
         internal static DrugDealScenarioScheme Scenario1 = new DrugDealScenarioScheme
         (
@@ -182,10 +183,5 @@ namespace GangRaids.Scenarios.DrugDealScenarios
             Scenario4,
             Scenario5
         };
-
-        internal static DrugDealScenario ChooseScenario()
-        {
-            return new DrugDealScenario(ScenarioSchemeList.RandomElement());
-        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Rage;
 using Rage.Native;
+using GangRaids.HelperClasses.CommonUtilities;
 
 namespace GangRaids.HelperClasses.DrugDealHelpers
 {
@@ -20,7 +21,7 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
         private Vehicle copCar2;
 
         private List<string> buyerCarStringList = new List<string> { "Emperor", "Primo", "Stanier", "Seminole", "Landstalker", "Cavalcade", "Bison" , "Oracle", "Asterope", "Fugitive", "Asea", "Ingot", "Premier", "Stratum", "Washington"};
-        private List<string> dealerCarStringList = new List<string> { "Buccaneer", "Tornado", "Manana", "Chino", "Dukes", "Stalion", "Phoenix", "Sabregt", "Vigero", "Peyote", "Ruiner", "Virgo" };
+        private List<string> dealerCarStringList = new List<string> { "Buccaneer", "Tornado", "Chino", "Dukes", "Stalion", "Phoenix", "Sabregt", "Vigero", "Peyote", "Ruiner", "Virgo" };
         private List<string> dealerVanStringList = new List<string> { "Speedo", "Burrito3", "Youga" };
         private Dictionary<List<string>, string> badBoyPedStringListDict = new Dictionary<List<string>, string>
         {
@@ -29,8 +30,8 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
             { new List<string> { "g_m_y_lost_01", "g_m_y_lost_02", "g_m_y_lost_03" }, "BIKER_GANG" },
             { new List<string> { "g_m_y_mexgang_01", "g_m_y_mexgoon_01", "g_m_y_mexgoon_02", "g_m_y_mexgoon_03" } , "MEXICAN_GANG" }
         };
-        private List<string> badBoyPistolList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50" };
-        private List<string> badBoyBigGunList = new List<string> { "weapon_assaultrifle", "weapon_pumpshotgun", "weapon_sawnoffshotgun", "weapon_smg", "weapon_microsmg" };
+        private List<string> badBoyPistolList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
+        private List<string> badBoyBigGunList = new List<string> { "weapon_assaultrifle", "weapon_pumpshotgun", "weapon_sawnoffshotgun", "weapon_smg"};
 
         private List<Ped> dealerList;
         private List<Ped> buyerList;
@@ -59,7 +60,7 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
 
         internal DrugDealScenario(DrugDealScenarioScheme scheme)
         {
-            this.name = Name;
+            this.name = scheme.Name;
             this.copCarBuildList = new List<CopCarBuild>(scheme.CopCarBuildList);
             this.copCarWayPointList = new List<CopCarWayPoint>(scheme.CopCarWayPointList);
             this.dealerVanSpawnPos4 = scheme.BadGuyCarSpawnPos4List[0].Copy();
@@ -201,10 +202,12 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
             var dealerPedStringKeyValuePair = badBoyPedStringListDict.RandomElement();
             dealerGangNameString = dealerPedStringKeyValuePair.Value;
             dealer1 = dealer1SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+            dealer1.RandomizeVariation();
             dealer1.IsPersistent = true;
             dealer1.BlockPermanentEvents = true;
             list.Add(dealer1);
             dealer2 = dealer2SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+            dealer2.RandomizeVariation();
             dealer2.IsPersistent = true;
             dealer2.BlockPermanentEvents = true;
             list.Add(dealer2);
@@ -212,6 +215,7 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
             {
                 dealer3WasSpawned = true;
                 dealer3 = dealer3SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+                dealer3.RandomizeVariation();
                 dealer3.IsPersistent = true;
                 dealer3.BlockPermanentEvents = true;
                 Game.LogTrivial("Decided to spawn dealer3.");
@@ -246,10 +250,12 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
             var buyerPedStringKeyValuePair = badBoyPedStringListDict.RandomElement();
             buyerGangNameString = buyerPedStringKeyValuePair.Value;
             buyer1 = buyer1SpawnPos4.CreatePed(buyerPedStringKeyValuePair.Key.RandomElement());
+            buyer1.RandomizeVariation();
             buyer1.IsPersistent = true;
             buyer1.BlockPermanentEvents = true;
             list.Add(buyer1);
             buyer2 = buyer2SpawnPos4.CreatePed(buyerPedStringKeyValuePair.Key.RandomElement());
+            buyer2.RandomizeVariation();
             buyer2.IsPersistent = true;
             buyer2.BlockPermanentEvents = true;
             list.Add(buyer2);

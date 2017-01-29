@@ -7,6 +7,7 @@ using LSPD_First_Response.Mod.Callouts;
 using GangRaids.HelperClasses;
 using GangRaids.HelperClasses.DrugDealHelpers;
 using GangRaids.INIFile;
+using GangRaids.HelperClasses.CommonUtilities;
 
 namespace GangRaids.Callouts
 {
@@ -97,7 +98,7 @@ namespace GangRaids.Callouts
                 if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 200f)
                 {
                     SuspectsAreaBlip.DisableRoute();
-                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangRaids_PROCEED_WITH_CAUTION");
+                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangRaids_PROCEED_WITH_CAUTION");
                     DrugDealState = EDrugDealState.InPreparation;
                 }
             }
