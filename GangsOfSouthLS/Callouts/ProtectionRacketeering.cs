@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Rage;
 using LSPD_First_Response.Mod.Callouts;
 using LSPD_First_Response.Mod.API;
-using GangRaids.HelperClasses.CommonUtilities;
-using GangRaids.HelperClasses.ProtectionRacketeeringHelpers;
-using GangRaids.INIFile;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
+using GangsOfSouthLS.INIFile;
 
-namespace GangRaids.Callouts
+namespace GangsOfSouthLS.Callouts
 {
     [CalloutInfo("Drug Deal", CalloutProbability.Always)]
     class ProtectionRacketeering : Callout
@@ -28,7 +28,7 @@ namespace GangRaids.Callouts
             var scenarioFound = ProtectionRacketeeringScenarioScheme.ChooseScenario(out ScenarioScheme);
             if (!scenarioFound)
             {
-                Game.LogTrivial("[GANG RAIDS] Could not find scenario in range.");
+                Game.LogTrivial("[GangsOfSouthLS] Could not find scenario in range.");
                 return false;
             }
             Scenario = new ProtectionRacketeeringScenario(ScenarioScheme);
@@ -56,7 +56,7 @@ namespace GangRaids.Callouts
             {
                 if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 100f)
                 {
-                    Game.LogTrivial("[GANG RAIDS] Player arrived on scene.");
+                    Game.LogTrivial("[GangsOfSouthLS] Player arrived on scene.");
                     RacketState = ERacketState.ArrivedOnScene;
                 }
 
@@ -68,7 +68,7 @@ namespace GangRaids.Callouts
                 {
                     firstloop = false;
                     TimeBeforeCarSpawn = (UsefulExtensions.rng.Next(30) + 10) * 1000;
-                    Game.LogTrivial(string.Format("[GANG RAIDS] Waiting {0} s to spawn car.", (TimeBeforeCarSpawn / 1000)));
+                    Game.LogTrivial(string.Format("[GangsOfSouthLS] Waiting {0} s to spawn car.", (TimeBeforeCarSpawn / 1000)));
                     GameFiber.StartNew(delegate
                     {
                         GameFiber.Wait(TimeBeforeCarSpawn);

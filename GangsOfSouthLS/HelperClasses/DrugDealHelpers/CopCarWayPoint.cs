@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rage;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.HelperClasses.DrugDealHelpers
+namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
     class CopCarWayPoint
     {

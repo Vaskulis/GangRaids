@@ -4,13 +4,13 @@ using System.Windows.Forms;
 using Rage;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
-using GangRaids.HelperClasses;
-using GangRaids.HelperClasses.DrugDealHelpers;
-using GangRaids.Callouts;
-using GangRaids.INIFile;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses;
+using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
+using GangsOfSouthLS.Callouts;
+using GangsOfSouthLS.INIFile;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.Menus
+namespace GangsOfSouthLS.Menus
 {
     class DrugDealMenu
     {
@@ -39,7 +39,7 @@ namespace GangRaids.Menus
 
                 _menuPool = new MenuPool();
 
-                DrugDealPositionMenu = new UIMenu("Gang Raids", "~b~Drug Deal Menu");
+                DrugDealPositionMenu = new UIMenu("GangsOfSouthLS", "~b~Drug Deal Menu");
                 DrugDealPositionMenu.SetKey(Common.MenuControls.Up, Keys.W);
                 DrugDealPositionMenu.SetKey(Common.MenuControls.Down, Keys.S);
                 DrugDealPositionMenu.SetKey(Common.MenuControls.Left, Keys.A);

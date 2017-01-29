@@ -1,22 +1,22 @@
 ﻿using LSPD_First_Response.Mod.API;
 using Rage;
-using GangRaids.Menus;
-using GangRaids.INIFile;
+using GangsOfSouthLS.Menus;
+using GangsOfSouthLS.INIFile;
 
-[assembly: Rage.Attributes.Plugin("Gang Raids", Description = "Vaskulis' Gang Raids", Author = "Vaskulis")]
+[assembly: Rage.Attributes.Plugin("GangsOfSouthLS", Description = "Vaskulis' GangsOfSouthLS", Author = "Vaskulis")]
 
-namespace GangRaids
+namespace GangsOfSouthLS
 {
     internal class Main : Plugin
     {
         public override void Initialize()
         {
             Functions.OnOnDutyStateChanged += OnOnDutyStateChangedHandler;
-            Game.LogTrivial("Initializing Gang Raids plugin.");
+            Game.LogTrivial("Initializing GangsOfSouthLS plugin.");
         }
         public override void Finally()
         {
-            Game.LogTrivial("Gang Raids has been cleaned up.");
+            Game.LogTrivial("GangsOfSouthLS has been cleaned up.");
         }
         private static void OnOnDutyStateChangedHandler(bool OnDuty)
         {

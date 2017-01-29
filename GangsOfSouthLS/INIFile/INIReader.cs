@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using Rage;
 
-namespace GangRaids.INIFile
+namespace GangsOfSouthLS.INIFile
 {
     internal static class INIReader
     {
@@ -15,11 +15,11 @@ namespace GangRaids.INIFile
 
         internal static bool LoadINIFile()
         {
-            IniFile = new InitializationFile(@"Plugins/LSPDFR/GangRaids.ini");
+            IniFile = new InitializationFile(@"Plugins/LSPDFR/GangsOfSouthLS.ini");
             if (!IniFile.Exists())
             {
-                Game.LogTrivial("Could not find INI File. Make sure you installed Gang Raids correctly. Not loading Gang Raids...");
-                Game.DisplaySubtitle("Gang Raids could not find its INI File. Make sure you installed it correctly. Not loading Gang Raids...");
+                Game.LogTrivial("Could not find INI File. Make sure you installed GangsOfSouthLS correctly. Not loading GangsOfSouthLS...");
+                Game.DisplaySubtitle("GangsOfSouthLS could not find its INI File. Make sure you installed it correctly. Not loading GangsOfSouthLS...");
                 return false;
             }
             SetMenuKey();
@@ -39,7 +39,7 @@ namespace GangRaids.INIFile
             else
             {
                 Game.LogTrivial("Couldn't read player specified value for MenuKey, using default value L");
-                Game.DisplayNotification("~b~Gang Raids: ~r~Couldn't read player specified value for MenuKey, using default value L!");
+                Game.DisplayNotification("~b~GangsOfSouthLS: ~r~Couldn't read player specified value for MenuKey, using default value L!");
                 MenuKey = Keys.L;
             }
         }
@@ -54,7 +54,7 @@ namespace GangRaids.INIFile
             else
             {
                 Game.LogTrivial("Couldn't read player specified value for MenuModifierKey, using default value LControlKey");
-                Game.DisplayNotification("~b~Gang Raids: ~r~Couldn't read player specified value for MenuModifierKey, using default value LControlKey!");
+                Game.DisplayNotification("~b~GangsOfSouthLS: ~r~Couldn't read player specified value for MenuModifierKey, using default value LControlKey!");
                 MenuModifierKey = Keys.LControlKey;
             }
         }

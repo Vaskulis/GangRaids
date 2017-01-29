@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using GangRaids.HelperClasses.DrugDealHelpers;
+using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 
-namespace GangRaids.Scenarios.DrugDealScenarios
+namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
 {
     class CopCarsBuilds
     {

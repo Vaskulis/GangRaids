@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Rage;
 using System.Globalization;
 
-namespace GangRaids.HelperClasses.CommonUtilities
+namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 {
     internal class Pos4
     {

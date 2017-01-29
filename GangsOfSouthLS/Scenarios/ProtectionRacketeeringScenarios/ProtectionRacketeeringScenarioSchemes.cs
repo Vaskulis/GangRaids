@@ -1,13 +1,13 @@
-﻿using GangRaids.HelperClasses.ProtectionRacketeeringHelpers;
-using GangRaids.HelperClasses;
+﻿using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
+using GangsOfSouthLS.HelperClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.Scenarios.ProtectionRacketeeringScenarios
+namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
 {
     static class ProtectionRacketeeringScenarioSchemes
     {

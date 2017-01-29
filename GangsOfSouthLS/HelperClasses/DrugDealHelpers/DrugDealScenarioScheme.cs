@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Rage;
-using GangRaids.Scenarios.DrugDealScenarios;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.Scenarios.DrugDealScenarios;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.HelperClasses.DrugDealHelpers
+namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
     class DrugDealScenarioScheme
     {
@@ -54,7 +54,7 @@ namespace GangRaids.HelperClasses.DrugDealHelpers
                 {
                     scenarioScheme = item;
                     foundOne = true;
-                    Game.LogTrivial(string.Format("[GANG RAIDS] Chose Scenario: {0}", item.Name));
+                    Game.LogTrivial(string.Format("[GangsOfSouthLS] Chose Scenario: {0}", item.Name));
                     break;
                 }
             }

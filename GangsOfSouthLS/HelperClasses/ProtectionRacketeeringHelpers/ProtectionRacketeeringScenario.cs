@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rage;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
+namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
 {
     class ProtectionRacketeeringScenario
     {
@@ -57,7 +57,7 @@ namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
         {
             GameFiber.StartNew(delegate
             {
-                Game.LogTrivial(string.Format("[GANG RAIDS] Initializing {0}", name));
+                Game.LogTrivial(string.Format("[GangsOfSouthLS] Initializing {0}", name));
                 foreach (var entity in World.GetEntities(position, 40f, GetEntitiesFlags.ConsiderAllPeds | GetEntitiesFlags.ExcludePlayerPed))
                 {
                     if (entity.Exists())

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rage;
-using GangRaids.Scenarios.ProtectionRacketeeringScenarios;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
+namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
 {
     class ProtectionRacketeeringScenarioScheme
     {
@@ -51,7 +51,7 @@ namespace GangRaids.HelperClasses.ProtectionRacketeeringHelpers
                 {
                     scenarioScheme = item;
                     foundOne = true;
-                    Game.LogTrivial(string.Format("[GANG RAIDS] Chose Scenario: {0}", item.Name));
+                    Game.LogTrivial(string.Format("[GangsOfSouthLS] Chose Scenario: {0}", item.Name));
                     break;
                 }
             }

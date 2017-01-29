@@ -7,8 +7,8 @@
     <ProjectGuid>{9FFB325B-41C0-4EA0-8633-24A6EC450780}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GangRaids</RootNamespace>
-    <AssemblyName>GangRaids</AssemblyName>
+    <RootNamespace>GangsOfSouthLS</RootNamespace>
+    <AssemblyName>GangsOfSouthLS</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -89,7 +89,7 @@
     <Compile Include="Scenarios\ProtectionRacketeeringScenarios\ProtectionRacketeeringScenarioSchemes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="INIFile\GangRaids.ini" />
+    <None Include="INIFile\GangsOfSouthLS.ini" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

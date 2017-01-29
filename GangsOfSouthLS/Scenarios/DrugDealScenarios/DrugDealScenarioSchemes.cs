@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using GangRaids.HelperClasses;
-using GangRaids.HelperClasses.DrugDealHelpers;
+using GangsOfSouthLS.HelperClasses;
+using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using Rage;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.Scenarios.DrugDealScenarios
+namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
 {
     static class DrugDealScenarioSchemes
     {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Rage;
 using Rage.Native;
-using GangRaids.HelperClasses.CommonUtilities;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
-namespace GangRaids.HelperClasses.DrugDealHelpers
+namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
     class DrugDealScenario
     {
