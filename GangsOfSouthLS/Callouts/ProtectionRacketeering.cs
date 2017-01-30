@@ -88,24 +88,23 @@ namespace GangsOfSouthLS.Callouts
 
             if (RacketState == ERacketState.ArrivedOnScene)
             {
-                Game.DisplayHelp("Wait for the ~y~suspects to arrive.");
+                Game.DisplayHelp("Wait for the ~y~suspects ~w~to arrive.");
                 if (firstloop)
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Player arrived on scene.");
                     firstloop = false;
-                    TimeBeforeCarSpawn = (UsefulFunctions.rng.Next(20)) * 1000;
+                    TimeBeforeCarSpawn = (UsefulFunctions.rng.Next(10)) * 1000;
                     Game.LogTrivial(string.Format("[GangsOfSouthLS] Waiting {0} s to spawn car.", (TimeBeforeCarSpawn / 1000)));
-
+                    MakeMerchantBlip();
                     ShopBlip.SafelyDelete();
-                    MerchantBlip = new Blip(Scenario.Merchant);
-                    MerchantBlip.Scale = 0.75f;
-                    MerchantBlip.Color = System.Drawing.Color.Orange;
 
                     GameFiber.StartNew(delegate
                     {
                         GameFiber.Wait(TimeBeforeCarSpawn);
                         Scenario.SpawnCarAndBadGuys();
-                        RacketState = ERacketState.OnSceneAndWaiting;
+                        //RacketState = ERacketState.OnSceneAndWaiting;
+                        MakeCarBlip();
+                        RacketState = ERacketState.WaitingForPullover;
                         firstloop = true;
                         return;
                     });
@@ -114,21 +113,24 @@ namespace GangsOfSouthLS.Callouts
 
             if (RacketState == ERacketState.OnSceneAndWaiting)
             {
+                CleanUp();
+                Game.DisplayHelp("Wait for the ~y~suspects ~w~to arrive.");
                 if (firstloop)
                 {
-                    Game.LogTrivial("[GangsOfSouthLS] Player is on the scene and waiting.");
+                    Game.LogTrivial("[GangsOfSouthLS] Car spawned, player is on the scene and waiting.");
                     firstloop = false;
                     GameFiber.StartNew(delegate
                     {
                         Scenario.Driver.Tasks.DriveToPosition(Scenario.ParkingPos4.Position, 12f, VehicleDrivingFlags.Normal, 30f).WaitForCompletion(120000);
                         Scenario.Driver.Tasks.DriveToPosition(Scenario.ParkingPos4.Position, 8f, VehicleDrivingFlags.Normal, 15f).WaitForCompletion(120000);
                         Scenario.Driver.Tasks.ParkVehicle(Scenario.ParkingPos4.Position, Scenario.ParkingPos4.Heading).WaitForCompletion(20000);
-                        InitializeBlips();
+                        MakeCarBlip();
+                        MakePassengerBlip();
 
                         Scenario.Passenger.Tasks.FollowNavigationMeshToPosition(Scenario.RacketeerShopPos4.Position, Scenario.RacketeerShopPos4.Heading, 1f).WaitForCompletion(20000);
                         GameFiber.Wait(5000);
                         Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 1f).WaitForCompletion(20000);
-                        ShopBlip.SafelyDelete();
+                        PassengerBlip.Delete();
                         MerchantBlip.SafelyDelete();
 
                         Scenario.Driver.Tasks.CruiseWithVehicle(12f, VehicleDrivingFlags.Normal);
@@ -142,48 +144,73 @@ namespace GangsOfSouthLS.Callouts
 
             if (RacketState == ERacketState.WaitingForPullover)
             {
+                CleanUp();
+                Game.DisplayHelp("Pull over the ~y~suspect's car~w~.");
                 if (Functions.IsPlayerPerformingPullover() && (Functions.GetPulloverSuspect(Functions.GetCurrentPullover())) == Scenario.Driver)
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Player started Pullover.");
                     CarBlip.SafelyDelete();
                     RacketState = ERacketState.InPullover;
                 }
+                if (Functions.IsPedGettingArrested(Scenario.Driver))
+                {
+                    MakeStuffHappenWhenArrestingTheDriver();
+                }
             }
 
             if (RacketState == ERacketState.InPullover)
             {
+                CleanUp();
+                Game.DisplayHelp("Arrest the ~r~suspects~w~!");
                 if (!Functions.IsPlayerPerformingPullover() || !(Functions.GetPulloverSuspect(Functions.GetCurrentPullover()) == Scenario.Driver))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Player aborted Pullover, waiting again.");
-                    CarBlip = new Blip(Scenario.GangsterCar);
-                    CarBlip.Color = System.Drawing.Color.Yellow;
-                    CarBlip.Order = 2;
+                    MakeCarBlip();
                     RacketState = ERacketState.WaitingForPullover;
                 }
                 if (!(Functions.GetActivePursuit() == null))
                 {
-                    Functions.ForceEndCurrentPullover();
-                    Pursuit = Functions.GetActivePursuit();
-                    Game.LogTrivial("[GangsOfSouthLS] LSPDFR started pursuit automatically, giving up control of Driver and making Passenger fight.");
-                    DriverBlip.SafelyDelete();
-                    Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
-                    RacketState = ERacketState.InAutomaticPursuit;
+                    MakeStuffHappenWhenAutomaticPursuitIsCreated();
                 }
-                if ((Functions.GetActivePursuit() == null) && !Game.LocalPlayer.Character.IsInAnyVehicle(false) && (Game.LocalPlayer.Character.DistanceTo(Scenario.Driver) < 3f))
+                if ((Functions.GetActivePursuit() == null) && !Game.LocalPlayer.Character.IsInAnyVehicle(false) && (Game.LocalPlayer.Character.DistanceTo(Scenario.Driver) < 6f))
                 {
-                    Functions.ForceEndCurrentPullover();
-                    Game.LogTrivial("[GangsOfSouthLS] Making gangsters fight player.");
-                    RacketState = ERacketState.Fighting;
-                    GameFiber.StartNew(delegate
+                    if (UsefulFunctions.Decide(35)) //Make them fight
                     {
-                        Scenario.Driver.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
-                        Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                    });
-                    GameFiber.StartNew(delegate
+                        MakeStuffHappenWhenStartingAFight();
+                    }
+                    else  //Make them drive off
                     {
-                        Scenario.Passenger.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
-                        Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
-                    });
+                        MakeStuffHappenWhenCreatingSelfmadePursuit();
+                    }
+                    if (Functions.IsPedGettingArrested(Scenario.Driver))
+                    {
+                        MakeStuffHappenWhenArrestingTheDriver();
+                    }
+                }
+            }
+
+            if (RacketState == ERacketState.DriverSafelyArrested)
+            {
+                CleanUp();
+                Game.DisplayHelp("Arrest the ~r~suspects!");
+                if (UsefulFunctions.Decide(20))
+                {
+                    MakeStuffHappenWhenCreatingSelfmadePursuit();
+                }
+                else
+                {
+                    Game.LogTrivial("[GangsOfSouthLS] Passenger is not fleeing.");
+                    RacketState = ERacketState.CanBeEnded;
+                }
+            }
+
+            if (RacketState == ERacketState.CanBeEnded)
+            {
+                CleanUp();
+                if ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger) && (!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Passenger))))
+                {
+                    End();
+                    return;
                 }
             }
 
@@ -192,24 +219,17 @@ namespace GangsOfSouthLS.Callouts
                 CleanUp();
                 if (!(Functions.GetActivePursuit() == null))
                 {
-                    Functions.ForceEndCurrentPullover();
-                    Pursuit = Functions.GetActivePursuit();
-                    Game.LogTrivial("[GangsOfSouthLS] LSPDFR started pursuit automatically, giving up control of Driver and making Passenger fight.");
-                    DriverBlip.SafelyDelete();
-                    RacketState = ERacketState.InAutomaticPursuit;
-                }
-                if ((!Scenario.Passenger.IsValid() || Scenario.Passenger.IsDead) && (!Scenario.Driver.IsValid() || Scenario.Driver.IsDead))
-                {
-                    End();
+                    MakeStuffHappenWhenAutomaticPursuitIsCreated();
                 }
             }
 
-            if (RacketState == ERacketState.InAutomaticPursuit)
+            if (RacketState == ERacketState.InPursuit)
             {
                 CleanUp();
-                if(!Functions.IsPursuitStillRunning(Pursuit) && (!Scenario.Passenger.IsValid() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)))
+                if(!Functions.IsPursuitStillRunning(Pursuit) && (!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)))
                 {
                     End();
+                    return;
                 }
             }
 
@@ -236,37 +256,157 @@ namespace GangsOfSouthLS.Callouts
 
         internal enum ERacketState
         {
-            Accepted, ArrivedOnScene, OnSceneAndWaiting, WaitingForPullover, InPullover, InAutomaticPursuit, Fighting, Ended
+            Accepted, ArrivedOnScene, OnSceneAndWaiting, WaitingForPullover, InPullover, InPursuit, Fighting, DriverSafelyArrested, CanBeEnded, Ended
         }
 
-        internal void InitializeBlips()
+        internal void MakeCarBlip()
         {
             CarBlip = new Blip(Scenario.GangsterCar);
             CarBlip.Color = System.Drawing.Color.Yellow;
-            CarBlip.Order = 2;
+            CarBlip.Order = 999;
+        }
+
+        internal void MakePassengerBlip()
+        {
             PassengerBlip = new Blip(Scenario.Passenger);
             PassengerBlip.Color = System.Drawing.Color.FromArgb(224, 50, 50);
             PassengerBlip.Scale = 0.75f;
             PassengerBlip.Order = 1;
+        }
+
+        internal void MakeDriverBlip()
+        {
             DriverBlip = new Blip(Scenario.Driver);
-            PassengerBlip.Color = System.Drawing.Color.FromArgb(224, 50, 50);
-            PassengerBlip.Scale = 0.75f;
-            PassengerBlip.Order = 1;
+            DriverBlip.Color = System.Drawing.Color.FromArgb(224, 50, 50);
+            DriverBlip.Scale = 0.75f;
+            DriverBlip.Order = 1;
+        }
+
+        internal void MakeMerchantBlip()
+        {
+            MerchantBlip = new Blip(Scenario.Merchant);
+            MerchantBlip.Scale = 0.75f;
+            MerchantBlip.Color = System.Drawing.Color.Orange;
         }
 
         internal void CleanUp()
         {
-            if (Scenario.Driver.IsValid() && Scenario.Driver.IsDead)
+            if (Scenario.Driver.Exists() && Scenario.Driver.IsDead)
             {
                 DriverBlip.SafelyDelete();
                 Scenario.Driver.SafelyDismiss();
             }
-            if (Scenario.Passenger.IsValid() && Scenario.Passenger.IsDead)
+            if (Scenario.Passenger.Exists() && Scenario.Passenger.IsDead)
             {
                 PassengerBlip.SafelyDelete();
                 Scenario.Passenger.SafelyDismiss();
             }
+            EndIfPlayerDies();
+            TestEndCondition();
         }
-      
+
+        internal void TestEndCondition()
+        {
+            if ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger) && (!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Passenger))))
+            {
+                End();
+            }
+        }
+
+        internal void EndIfPlayerDies()
+        {
+            if (Game.LocalPlayer.Character.IsDead)
+            {
+                End();
+            }
+        }
+
+        internal void MakeStuffHappenWhenAutomaticPursuitIsCreated()
+        {
+            Functions.ForceEndCurrentPullover();
+            Pursuit = Functions.GetActivePursuit();
+            Game.LogTrivial("[GangsOfSouthLS] LSPDFR started pursuit automatically, giving up control of Driver and making Passenger fight.");
+            MakePassengerBlip();
+            Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
+            RacketState = ERacketState.InPursuit;
+        }
+
+        internal void MakeStuffHappenWhenCreatingSelfmadePursuit()
+        {
+            CleanUp();
+            Functions.ForceEndCurrentPullover();
+            Pursuit = Functions.CreatePursuit();
+            if (!Scenario.Passenger.IsDead && Scenario.Passenger.IsInAnyVehicle(false) && (!Scenario.Passenger.CurrentVehicle.HasDriver || Functions.IsPedGettingArrested(Scenario.Driver) || Functions.IsPedArrested(Scenario.Driver) || Scenario.Driver.IsDead))
+            {
+                Game.LogTrivial("[GangsOfSouthLS] Starting pursuit, car has no driver, adding passenger to pursuit.");
+                GameFiber.StartNew(delegate
+                {
+                    GameFiber.Wait(3000);
+                    Scenario.Passenger.Tasks.ShuffleToAdjacentSeat().WaitForCompletion(5000);
+                    if(!(Functions.GetActivePursuit() == null))
+                    {
+                        Pursuit = Functions.GetActivePursuit();
+                    }
+                    Functions.AddPedToPursuit(Pursuit, Scenario.Passenger);
+                    Functions.SetPursuitIsActiveForPlayer(Pursuit, true);
+                });
+            }
+            else if (!Scenario.Driver.IsDead)
+            {
+                Game.LogTrivial("[GangsOfSouthLS] Starting pursuit, adding driver and making passenger fight.");
+                MakePassengerBlip();
+                if (!Scenario.Passenger.IsDead)
+                {
+                    Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
+                }
+                if (!(Functions.GetActivePursuit() == null))
+                {
+                    Pursuit = Functions.GetActivePursuit();
+                }
+                Functions.AddPedToPursuit(Pursuit, Scenario.Driver);
+                Functions.SetPursuitIsActiveForPlayer(Pursuit, true);
+            }
+            RacketState = ERacketState.InPursuit;
+        }
+
+        internal void MakeStuffHappenWhenStartingAFight()
+        {
+            Functions.ForceEndCurrentPullover();
+            Game.LogTrivial("[GangsOfSouthLS] Making gangsters fight player.");
+            RacketState = ERacketState.Fighting;
+            MakePassengerBlip();
+            MakeDriverBlip();
+            GameFiber.StartNew(delegate
+            {
+                if (Scenario.Driver.IsInAnyVehicle(false))
+                {
+                    Scenario.Driver.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
+                }
+                Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
+            });
+            GameFiber.StartNew(delegate
+            {
+                if (Scenario.Passenger.IsInAnyVehicle(false))
+                {
+                    Scenario.Passenger.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
+                }
+                Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
+            });
+        }      
+
+        internal void MakeStuffHappenWhenArrestingTheDriver()
+        {
+            Game.LogTrivial("[GangsOfSouthLS] Driver is getting arrested.");
+            Functions.ForceEndCurrentPullover();
+            if (UsefulFunctions.Decide(30))
+            {
+                MakeStuffHappenWhenStartingAFight();
+            }
+            else
+            {
+                Game.LogTrivial("[GangsOfSouthLS] Driver was arrested safely.");
+                RacketState = ERacketState.DriverSafelyArrested;
+            }
+        }
     }
 }

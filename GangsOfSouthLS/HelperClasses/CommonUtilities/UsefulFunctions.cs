@@ -83,7 +83,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void SafelyDelete(this Entity entity)
         {
-            if(!(entity == null) && entity.IsValid())
+            if(entity.Exists())
             {
                 entity.Delete();
             }
@@ -91,7 +91,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void SafelyDelete(this Blip blip)
         {
-            if(!(blip == null) && blip.IsValid())
+            if(blip.Exists())
             {
                 blip.Delete();
             }
@@ -99,7 +99,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void SafelyDismiss(this Entity entity)
         {
-            if (!(entity == null) && entity.IsValid())
+            if (entity.Exists())
             {
                 entity.Dismiss();
             }
