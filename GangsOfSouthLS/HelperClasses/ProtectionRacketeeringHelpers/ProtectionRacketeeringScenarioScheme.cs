@@ -17,6 +17,8 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         private Pos4 racketeerShopPos4;
         private Pos4 carSpawnPos4;
         private List<string> merchantPedStringList;
+        private Vector3 doorLocation;
+        private List<string> doorModelNames;
         private Vector3 position;
 
         internal string Name { get { return name; } }
@@ -25,9 +27,21 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         internal Pos4 RacketeerShopPos4 { get { return racketeerShopPos4; } }
         internal Pos4 CarSpawnPos4 { get { return carSpawnPos4; } }
         internal List<string> MerchantPedStringList { get { return merchantPedStringList; } }
+        internal Vector3 DoorLocation { get { return doorLocation; } }
+        internal List<string> DoorModelNames { get { return doorModelNames; } }
         internal Vector3 Position { get { return position; } }
 
-        internal ProtectionRacketeeringScenarioScheme(string Name, Pos4 ParkingPos4, Pos4 MerchantSpawnPos4, Pos4 RacketeerShopPos4, Pos4 CarSpawnPos4, List<string> MerchantPedStringList)
+        internal ProtectionRacketeeringScenarioScheme
+            (
+            string Name,
+            Pos4 ParkingPos4, 
+            Pos4 MerchantSpawnPos4, 
+            Pos4 RacketeerShopPos4, 
+            Pos4 CarSpawnPos4, 
+            List<string> MerchantPedStringList, 
+            Vector3 DoorLocation, 
+            List<string> DoorModelNames
+            )
         {
             this.name = Name;
             this.parkingPos4 = ParkingPos4;
@@ -36,6 +50,8 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
             this.carSpawnPos4 = CarSpawnPos4;
             this.position = MerchantSpawnPos4.Position;
             this.merchantPedStringList = MerchantPedStringList;
+            this.doorModelNames = DoorModelNames;
+            this.doorLocation = DoorLocation;
         }
 
         internal static bool ChooseScenario(out ProtectionRacketeeringScenarioScheme scenarioScheme)

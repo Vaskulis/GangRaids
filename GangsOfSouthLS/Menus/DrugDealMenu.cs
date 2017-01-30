@@ -206,7 +206,7 @@ namespace GangsOfSouthLS.Menus
             {
                 insertionPointDescriptionList.Add(spawnPoint.description);
             }
-            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, UsefulExtensions.rng.Next(insertionPointDescriptionList.Count));
+            insertionPointListItem = new UIMenuListItem("Your insertion point:", insertionPointDescriptionList, UsefulFunctions.rng.Next(insertionPointDescriptionList.Count));
             DrugDealPositionMenu.AddItem(insertionPointListItem);
         }
 
@@ -232,8 +232,8 @@ namespace GangsOfSouthLS.Menus
         private static void MakeCopCarListItems()
         {
             SelectedCopcarWaypointList = spawnPoints.FindAll(delegate (CopCarWayPoint ccwp) { return ccwp.description != insertionPointListItem.IndexToItem(insertionPointListItem.Index); });
-            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
-            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, UsefulExtensions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
+            copCar1ListItem = new UIMenuListItem(string.Format("Car 1: {0}", SelectedCopcarWaypointList[0].description), CopCarBuildNameList, UsefulFunctions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
+            copCar2ListItem = new UIMenuListItem(string.Format("Car 2: {0}", SelectedCopcarWaypointList[1].description), CopCarBuildNameList, UsefulFunctions.rng.Next(DrugDeal.Scenario.CopCarBuildList.Count));
             SelectedCopCar1Build = DrugDeal.Scenario.CopCarBuildList.Find(delegate (CopCarBuild ccb)
             {
                 return ccb.carName == copCar1ListItem.IndexToItem(copCar1ListItem.Index);

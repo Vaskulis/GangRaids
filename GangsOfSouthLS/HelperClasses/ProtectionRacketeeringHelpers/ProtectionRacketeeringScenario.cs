@@ -16,10 +16,12 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         private Pos4 racketeerShopPos4;
         private Pos4 carSpawnPos4;
         private Vector3 position;
+        private List<string> doorModelNames;
+        private Vector3 doorLocation;
 
         private Ped merchant;
         private Ped driver;
-        private Ped racketeer;
+        private Ped passenger;
         private Dictionary<List<string>, string> badBoyPedStringListDict = new Dictionary<List<string>, string>
         {
             { new List<string> { "g_m_y_ballaeast_01" , "g_m_y_ballaorig_01", "g_m_y_ballasout_01" }, "AFRICAN_AMERICAN_GANG" },
@@ -28,7 +30,8 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
             { new List<string> { "g_m_y_mexgang_01", "g_m_y_mexgoon_01", "g_m_y_mexgoon_02", "g_m_y_mexgoon_03" } , "MEXICAN_GANG" }
         };
         private List<string> merchantPedStringList;
-        private List<string> carList = new List<string> { "Emperor", "Tornado", "Buccaneer", "Stalion", "Sabregt", "Chino", "Virgo", "Tampa" };
+        private List<string> carList = new List<string> { "Emperor", "Tornado", "Buccaneer", "Stalion", "Sabregt", "Chino", "Virgo", "Tampa", "Blade", "Faction" };
+        private List<string> gunList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
         private Vehicle gangsterCar;
 
         internal string Name { get { return name; } }
@@ -39,8 +42,10 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         internal Vector3 Position { get { return position; } }
         internal Ped Merchant { get { return merchant; } }
         internal Ped Driver { get { return driver; } }
-        internal Ped Racketeer { get { return racketeer; } }
+        internal Ped Passenger { get { return passenger; } }
         internal Vehicle GangsterCar { get { return gangsterCar; } }
+        internal List<string> DoorModelNames { get { return doorModelNames; } }
+        internal Vector3 DoorLocation { get { return doorLocation; } }
 
         internal ProtectionRacketeeringScenario(ProtectionRacketeeringScenarioScheme scheme)
         {
@@ -51,6 +56,8 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
             this.carSpawnPos4 = scheme.CarSpawnPos4;
             this.position = scheme.Position;
             this.merchantPedStringList = scheme.MerchantPedStringList;
+            this.doorLocation = scheme.DoorLocation;
+            this.doorModelNames = scheme.DoorModelNames;
         }
 
         internal void Initialize()
@@ -81,6 +88,8 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         {
             MakeGangsterCar();
             MakeBadGuys();
+            Game.SetRelationshipBetweenRelationshipGroups("RACKET_GANGSTER", "COP", Relationship.Hate);
+            Game.SetRelationshipBetweenRelationshipGroups("RACKET_GANGSTER", "PLAYER", Relationship.Hate);
         }
 
         private void MakeGangsterCar()
@@ -88,6 +97,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
             var carnamestring = carList.RandomElement();
             gangsterCar = carSpawnPos4.CreateVehicle(carnamestring);
             gangsterCar.IsPersistent = true;
+            gangsterCar.RandomizePlate();
         }
 
         private void MakeMerchant()
@@ -103,15 +113,23 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         {
             var pedKeyValuePair = badBoyPedStringListDict.RandomElement();
             driver = new Ped(pedKeyValuePair.Key.RandomElement(), Vector3.Zero, 0f);
+            driver.RelationshipGroup = "RACKET_GANGSTER";
             driver.WarpIntoVehicle(gangsterCar, -1);
             driver.RandomizeVariation();
             driver.BlockPermanentEvents = true;
             driver.IsPersistent = true;
-            racketeer = new Ped(pedKeyValuePair.Key.RandomElement(), Vector3.Zero, 0f);
-            racketeer.WarpIntoVehicle(gangsterCar, 0);
-            racketeer.RandomizeVariation();
-            racketeer.BlockPermanentEvents = true;
-            racketeer.IsPersistent = true;
+            MyNatives.SetPedCombatAbilityAndMovement(driver, MyNatives.CombatAbilityFlag.Professional, MyNatives.CombatMovementFlag.Offensive);
+            driver.Inventory.GiveNewWeapon(gunList.RandomElement(), 999, false);
+            passenger = new Ped(pedKeyValuePair.Key.RandomElement(), Vector3.Zero, 0f);
+            passenger.RelationshipGroup = "RACKET_GANGSTER";
+            passenger.WarpIntoVehicle(gangsterCar, 0);
+            passenger.RandomizeVariation();
+            passenger.BlockPermanentEvents = true;
+            passenger.IsPersistent = true;
+            MyNatives.SetPedCombatAbilityAndMovement(passenger, MyNatives.CombatAbilityFlag.Professional, MyNatives.CombatMovementFlag.Offensive);
+            MyNatives.MakePedAbleToShootOutOfCar(passenger);
+            passenger.Inventory.GiveNewWeapon(gunList.RandomElement(), 999, false);
+
         }
     }
 }

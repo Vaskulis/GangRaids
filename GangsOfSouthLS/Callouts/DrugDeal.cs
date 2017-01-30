@@ -224,13 +224,13 @@ namespace GangsOfSouthLS.Callouts
                 {
                     PlayerStartPointBlip.Delete();
                 }
-                CreateBlip(Scenario.Buyer1, Buyer1Blip);
-                CreateBlip(Scenario.Buyer2, Buyer2Blip);
-                CreateBlip(Scenario.Dealer1, Dealer1Blip);
-                CreateBlip(Scenario.Dealer2, Dealer2Blip);
+                CreateSuspectBlip(Scenario.Buyer1, Buyer1Blip);
+                CreateSuspectBlip(Scenario.Buyer2, Buyer2Blip);
+                CreateSuspectBlip(Scenario.Dealer1, Dealer1Blip);
+                CreateSuspectBlip(Scenario.Dealer2, Dealer2Blip);
                 if (Scenario.Dealer3WasSpawned)
                 {
-                    CreateBlip(Scenario.Dealer3, Dealer3Blip);
+                    CreateSuspectBlip(Scenario.Dealer3, Dealer3Blip);
                 }
 
                 Pursuit = Functions.CreatePursuit();
@@ -240,7 +240,7 @@ namespace GangsOfSouthLS.Callouts
                 Game.SetRelationshipBetweenRelationshipGroups("DRUGDEAL_BUYER", "PLAYER", Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups("COP", "DRUGDEAL_BUYER", Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups("COP", "DRUGDEAL_DEALER", Relationship.Hate);
-                if (UsefulExtensions.Decide(15))
+                if (UsefulFunctions.Decide(15))
                 {
                     Game.SetRelationshipBetweenRelationshipGroups("DRUGDEAL_DEALER", "DRUGDEAL_BUYER", Relationship.Hate);
                     Game.SetRelationshipBetweenRelationshipGroups("DRUGDEAL_BUYER", "DRUGDEAL_DEALER", Relationship.Hate);
@@ -404,114 +404,78 @@ namespace GangsOfSouthLS.Callouts
 
         public override void End()
         {
-                IsCurrentlyRunning = false;
+            IsCurrentlyRunning = false;
+            SuspectsAreaBlip.SafelyDelete();
+            PlayerStartPointBlip.SafelyDelete();
+            PlayerEndPointBlip.SafelyDelete();
+            copCar1Blip.SafelyDelete();
+            copCar2Blip.SafelyDelete();
 
-                if (!(SuspectsAreaBlip == null) && SuspectsAreaBlip.Exists())
+            if (!(PedBlipDict == null))
+            {
+                foreach (var blip in PedBlipDict.Values)
                 {
-                    SuspectsAreaBlip.Delete();
+                    blip.SafelyDelete();
                 }
-                if (!(PlayerStartPointBlip == null) && PlayerStartPointBlip.Exists())
+            }
+
+            if (!(Scenario == null))
+            {
+                if (!(Scenario.BadBoyCarList == null))
                 {
-                    PlayerStartPointBlip.Delete();
-                }
-                if (!(PlayerEndPointBlip == null) && PlayerEndPointBlip.Exists())
-                {
-                    PlayerEndPointBlip.Delete();
-                }
-                if (!(copCar1Blip == null) && copCar1Blip.Exists())
-                {
-                    copCar1Blip.Delete();
-                }
-                if (!(copCar2Blip == null) && copCar2Blip.Exists())
-                {
-                    copCar2Blip.Delete();
-                }
-                if (!(PedBlipDict == null))
-                {
-                    foreach (var blip in PedBlipDict.Values)
+                    foreach (var veh in Scenario.BadBoyCarList)
                     {
-                        if (blip.Exists())
-                        {
-                            blip.Delete();
-                        }
+                        veh.SafelyDismiss();
                     }
                 }
+                if (!(Scenario.CopCarDict == null))
+                {
+                    foreach (var veh in Scenario.CopCarDict.Keys)
+                    {
+                        veh.SafelyDismiss();
+                    }
+                }
+            }
+
+            if (!endingregularly)
+            {
+                Game.LogTrivial("[GangsOfSouthLS] NOT ending callout regularly.");
                 if (!(Scenario == null))
                 {
-                    if (!(Scenario.BadBoyCarList == null))
+                    if (!(Scenario.DealerList == null))
                     {
-                        foreach (var veh in Scenario.BadBoyCarList)
+                        foreach (var Dealer in Scenario.DealerList)
                         {
-                            if (veh.Exists())
-                            {
-                                veh.Dismiss();
-                            }
+                            Dealer.SafelyDismiss();
                         }
                     }
-                    if (!(Scenario.CopCarDict == null))
+
+                    if (!(Scenario.BuyerList == null))
                     {
-                        foreach (var veh in Scenario.CopCarDict.Keys)
+                        foreach (var Buyer in Scenario.BuyerList)
                         {
-                            if (veh.Exists())
-                            {
-                                veh.Dismiss();
-                            }
+                            Buyer.SafelyDismiss();
                         }
                     }
-                }
 
-
-                if (!endingregularly)
-                {
-                    Game.LogTrivial("[GangsOfSouthLS] NOT ending callout regularly.");
-                    if (!(Scenario == null))
+                    if (!(Scenario.CopList1 == null))
                     {
-                        if (!(Scenario.DealerList == null))
+                        foreach (var Cop in Scenario.CopList1)
                         {
-                            foreach (var dealer in Scenario.DealerList)
-                            {
-                                if (dealer.Exists())
-                                {
-                                    dealer.Dismiss();
-                                }
-                            }
+                            Cop.SafelyDismiss();
                         }
+                    }
 
-                        if (!(Scenario.BuyerList == null))
+                    if (!(Scenario.CopList2 == null))
+                    {
+                        foreach (var Cop in Scenario.CopList2)
                         {
-                            foreach (var Buyer in Scenario.BuyerList)
-                            {
-                                if (Buyer.Exists())
-                                {
-                                    Buyer.Dismiss();
-                                }
-                            }
-                        }
-
-                        if (!(Scenario.CopList1 == null))
-                        {
-                            foreach (var Cop in Scenario.CopList1)
-                            {
-                                if (Cop.Exists())
-                                {
-                                    Cop.Dismiss();
-                                }
-                            }
-                        }
-
-                        if (!(Scenario.CopList2 == null))
-                        {
-                            foreach (var Cop in Scenario.CopList2)
-                            {
-                                if (Cop.Exists())
-                                {
-                                    Cop.Dismiss();
-                                }
-                            }
+                            Cop.SafelyDismiss();
                         }
                     }
                 }
-                base.End();
+            }
+            base.End();
         }
 
 
@@ -523,7 +487,7 @@ namespace GangsOfSouthLS.Callouts
 
         private void MakeDealer2DoStuff()
         {
-            if (UsefulExtensions.Decide(50))
+            if (UsefulFunctions.Decide(50))
             {
                 Game.LogTrivial("[GangsOfSouthLS] Decided to make Dealer2 try to enter van.");
                 GameFiber.StartNew(delegate
@@ -551,7 +515,7 @@ namespace GangsOfSouthLS.Callouts
             }
             else
             {
-                if (UsefulExtensions.Decide(80))
+                if (UsefulFunctions.Decide(80))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Decided to make Dealer2 fight straight away.");
                     MakeFight(Scenario.Dealer2);
@@ -570,7 +534,7 @@ namespace GangsOfSouthLS.Callouts
             if (Scenario.Dealer1.IsInAnyVehicle(false))
             {
                 Game.LogTrivial("[GangsOfSouthLS] Dealer1 is in car.");
-                if (UsefulExtensions.Decide(70))
+                if (UsefulFunctions.Decide(70))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Decided to make Dealer1 flee in car, adding to pursuit");
                     AddToPursuitAndDeleteBlip(Scenario.Dealer1);
@@ -584,7 +548,7 @@ namespace GangsOfSouthLS.Callouts
             else
             {
                 Game.LogTrivial("[GangsOfSouthLS] Dealer1 is NOT in car.");
-                if (UsefulExtensions.Decide(60))
+                if (UsefulFunctions.Decide(60))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Decided to make Dealer1 try to enter car.");
                     GameFiber.StartNew(delegate
@@ -630,7 +594,7 @@ namespace GangsOfSouthLS.Callouts
         {
             if (Buyer2IsFightingStraightAway)
             {
-                if (UsefulExtensions.Decide(70))
+                if (UsefulFunctions.Decide(70))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Decided to make Buyer1 join Buyer2 in combat");
                     MakeFight(Scenario.Buyer1);
@@ -687,7 +651,7 @@ namespace GangsOfSouthLS.Callouts
                         if (Scenario.Buyer2.IsInAnyVehicle(false))
                         {
                             Game.LogTrivial("[GangsOfSouthLS] Both Buyers are in car, making Buyer1 shoot out of the vehicle.");
-                            NativeFunction.Natives.SetPedCombatAttributes(Scenario.Buyer1, 1, true);
+                            MyNatives.MakePedAbleToShootOutOfCar(Scenario.Buyer1);
                             MakeFight(Scenario.Buyer1);
                             GameFiber.StartNew(delegate 
                             {
@@ -702,16 +666,10 @@ namespace GangsOfSouthLS.Callouts
                                     if (!Scenario.Buyer2.Exists())
                                     {
                                         Game.LogTrivial("[GangsOfSouthLS] Buyer 2 doesn't exist any more (suspect escaped). Despawning Buyer1, too.");
-                                        if (Buyer1Blip.Exists())
-                                        {
-                                            Buyer1Blip.Delete();
-                                        }
-                                        if (Scenario.Buyer1.Exists())
-                                        {
-                                            Scenario.Buyer1.Delete();
-                                        }
+                                        Buyer1Blip.SafelyDelete();
+                                        Scenario.Buyer1.SafelyDelete();
                                     }
-                                    if (UsefulExtensions.Decide(30))
+                                    if (UsefulFunctions.Decide(30))
                                     {
                                         Game.LogTrivial("[GangsOfSouthLS] Decided to make Buyer1 flee.");
                                         if (HasAnyPedBeenAddedToPursuit && Functions.IsPursuitStillRunning(Pursuit))
@@ -769,7 +727,7 @@ namespace GangsOfSouthLS.Callouts
             }
             else
             {
-                if (UsefulExtensions.Decide(70))
+                if (UsefulFunctions.Decide(70))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Decided to make Buyer2 try to enter car.");
                     GameFiber.StartNew(delegate
@@ -807,19 +765,21 @@ namespace GangsOfSouthLS.Callouts
 
         private void CleanUp()
         {
-
+            var newDict = new Dictionary<Ped, Blip> { };
             foreach(var pedblip in PedBlipDict)
             {
-                if (pedblip.Key.Exists() && pedblip.Key.IsDead)
+                if (pedblip.Key.Exists() && !pedblip.Key.IsDead)
                 {
-                    pedblip.Key.Dismiss();
+                    newDict.Add(pedblip.Key, pedblip.Value);
                 }
-                if (pedblip.Value.Exists() && (!pedblip.Key.Exists() || pedblip.Key.IsDead))
+                else
                 {
-                    Game.LogTrivial("[GangsOfSouthLS] Suspect was killed, deleting blip.");
-                    pedblip.Value.Delete();
+                    Game.LogTrivial("[GangsOfSouthLS] Suspect was killed, dismissing ped and deleting blip.");
+                    pedblip.Value.SafelyDelete();
+                    pedblip.Key.SafelyDismiss();
                 }
             }
+            PedBlipDict = newDict;
             var newList = new List<Ped> { };
             foreach(var fighter in FighterList)
             {
@@ -841,10 +801,7 @@ namespace GangsOfSouthLS.Callouts
 
         private void AddToPursuitAndDeleteBlip(Ped ped)
         {
-            if (!(PedBlipDict[ped] == null) && PedBlipDict[ped].Exists())
-            {
-                PedBlipDict[ped].Delete();
-            }
+            PedBlipDict[ped].SafelyDelete();
             Functions.AddPedToPursuit(Pursuit, ped);
             if(!playerAddedToPursuit)
             {
@@ -916,7 +873,7 @@ namespace GangsOfSouthLS.Callouts
             return false;
         }
 
-        private void CreateBlip(Ped ped, Blip blip)
+        private void CreateSuspectBlip(Ped ped, Blip blip)
         {
             blip = new Blip(ped);
             blip.Color = System.Drawing.Color.FromArgb(224, 50, 50);

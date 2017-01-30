@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rage;
 using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
 namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
@@ -18,7 +19,9 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             new Pos4(25.02721f, -1342.898f, 29.49704f, 221.721f),
             new Pos4(27.09624f, -1345.195f, 29.49704f, 40.14472f),
             new Pos4(101.8241f, -1166.002f, 30.2289f, 95.3634f),
-            new List<string> { "s_f_m_sweatshop_01", "mp_m_shopkeep_01" }
+            new List<string> { "s_f_m_sweatshop_01", "mp_m_shopkeep_01" },
+            new Vector3(29.0f, -1349.0f, 30.0f),
+            new List<string> { "v_ilev_247door_r", "v_ilev_247door" }
         );
 
         internal static List<ProtectionRacketeeringScenarioScheme> ScenarioSchemeList = new List<ProtectionRacketeeringScenarioScheme>
