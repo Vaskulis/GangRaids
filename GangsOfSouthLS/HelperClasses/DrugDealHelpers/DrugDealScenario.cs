@@ -182,14 +182,14 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             foreach(var seat in build.seatIndicesToOccupy)
             {
                 var cop = new Ped(build.pedNameList.RandomElement(), Vector3.Zero, 0f);
+                cop.RandomizeVariation();
                 var weaponDictEntry = build.weaponDict.RandomElement();
                 cop.Inventory.GiveNewWeapon(weaponDictEntry.Key, 999, true);
                 foreach(var component in weaponDictEntry.Value)
                 {
                     cop.Inventory.AddComponentToWeapon(weaponDictEntry.Key, component);
                 }
-                NativeFunction.Natives.SetPedCombatAbility(cop, 2);
-                NativeFunction.Natives.SetPedCombatMovement(cop, 2);
+                MyNatives.SetPedCombatAbilityAndMovement(cop, MyNatives.CombatAbilityFlag.Professional, MyNatives.CombatMovementFlag.Offensive);
                 cop.WarpIntoVehicle(veh, seat);
             }
             veh.IsPersistent = true;
@@ -211,7 +211,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             dealer2.IsPersistent = true;
             dealer2.BlockPermanentEvents = true;
             list.Add(dealer2);
-            if (UsefulExtensions.Decide(50))
+            if (UsefulFunctions.Decide(50))
             {
                 dealer3WasSpawned = true;
                 dealer3 = dealer3SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
@@ -219,13 +219,13 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
                 dealer3.IsPersistent = true;
                 dealer3.BlockPermanentEvents = true;
                 Game.LogTrivial("[GangsOfSouthLS] Decided to spawn dealer3.");
-                if (UsefulExtensions.Decide(50))
+                if (UsefulFunctions.Decide(50))
                 {
                     dealer1.WarpIntoVehicle(dealerCar, -1);
                     Game.LogTrivial("[GangsOfSouthLS] Decided to warp dealer1 into dealerCar.");
                 }
                 else { Game.LogTrivial("[GangsOfSouthLS] Decided NOT to warp dealer1 into dealerCar."); }
-                if (UsefulExtensions.Decide(70))
+                if (UsefulFunctions.Decide(70))
                 {
                     dealer3.Inventory.GiveNewWeapon(badBoyBigGunList.RandomElement(), 999, true);
                     Game.LogTrivial("[GangsOfSouthLS] Decided to give dealer3 bigger gun.");
@@ -236,8 +236,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             else { Game.LogTrivial("[GangsOfSouthLS] Decided NOT to spawn dealer3."); }
             foreach (var dealer in list)
             {
-                NativeFunction.Natives.SetPedCombatAbility(dealer, 2);
-                NativeFunction.Natives.SetPedCombatMovement(dealer, 1);
+                MyNatives.SetPedCombatAbilityAndMovement(dealer, MyNatives.CombatAbilityFlag.Professional, MyNatives.CombatMovementFlag.Defensive);
                 dealer.Inventory.GiveNewWeapon(badBoyPistolList.RandomElement(), 999, false);
                 dealer.RelationshipGroup = "DRUGDEAL_DEALER";
             }
@@ -262,8 +261,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             foreach (var buyer in list)
             {
                 buyer.Inventory.GiveNewWeapon(badBoyPistolList.RandomElement(), 999, false);
-                NativeFunction.Natives.SetPedCombatAbility(buyer, 2);
-                NativeFunction.Natives.SetPedCombatMovement(buyer, 1);
+                MyNatives.SetPedCombatAbilityAndMovement(buyer, MyNatives.CombatAbilityFlag.Professional, MyNatives.CombatMovementFlag.Defensive);
                 buyer.RelationshipGroup = "DRUGDEAL_BUYER";
             }
             return list;

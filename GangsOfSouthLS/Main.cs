@@ -33,7 +33,7 @@ namespace GangsOfSouthLS
         private static void RegisterCallouts()
         {
             Functions.RegisterCallout(typeof(Callouts.DrugDeal));
-            //Functions.RegisterCallout(typeof(Callouts.ProtectionRacketeering));
+            Functions.RegisterCallout(typeof(Callouts.ProtectionRacketeering));
         }
     }
 }
