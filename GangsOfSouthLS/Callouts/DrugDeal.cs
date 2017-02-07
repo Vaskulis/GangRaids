@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
-using Rage;
-using Rage.Native;
-using LSPD_First_Response.Mod.API;
-using LSPD_First_Response.Mod.Callouts;
-using GangsOfSouthLS.HelperClasses;
+﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using GangsOfSouthLS.INIFile;
-using GangsOfSouthLS.HelperClasses.CommonUtilities;
+using LSPD_First_Response.Mod.API;
+using LSPD_First_Response.Mod.Callouts;
+using Rage;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace GangsOfSouthLS.Callouts
 {
     [CalloutInfo("Drug Deal", CalloutProbability.High)]
-    class DrugDeal : Callout
+    internal class DrugDeal : Callout
     {
         internal static DrugDealScenario Scenario;
         internal static DrugDealScenarioScheme ScenarioScheme;
@@ -48,7 +46,6 @@ namespace GangsOfSouthLS.Callouts
         private bool copCar2arrived = false;
         private bool playerAddedToPursuit = false;
 
-
         public override bool OnBeforeCalloutDisplayed()
         {
             var scenarioFound = DrugDealScenarioScheme.ChooseScenario(out ScenarioScheme);
@@ -66,7 +63,6 @@ namespace GangsOfSouthLS.Callouts
             Buyer2IsFightingStraightAway = false;
             return base.OnBeforeCalloutDisplayed();
         }
-
 
         public override bool OnCalloutAccepted()
         {
@@ -87,7 +83,6 @@ namespace GangsOfSouthLS.Callouts
             }
             return base.OnCalloutAccepted();
         }
-
 
         public override void Process()
         {
@@ -259,7 +254,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     MakeDealer3DoStuff();
                 }
-                if (!(Functions.GetPursuitPeds(Pursuit) == null) && !(Functions.GetPursuitPeds(Pursuit).Length == 0) )
+                if (!(Functions.GetPursuitPeds(Pursuit) == null) && !(Functions.GetPursuitPeds(Pursuit).Length == 0))
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Adding cops to pursuit.");
                     foreach (var cop in Scenario.CopList1)
@@ -326,7 +321,6 @@ namespace GangsOfSouthLS.Callouts
                 DrugDealState = EDrugDealState.PlayingLogic;
             }
 
-
             if (DrugDealState == EDrugDealState.PlayingLogic)
             {
                 if (Game.LocalPlayer.Character.IsDead)
@@ -350,7 +344,6 @@ namespace GangsOfSouthLS.Callouts
                 CleanUp();
             }
 
-
             if (DrugDealState == EDrugDealState.WaitingToLeaveScene)
             {
                 CleanUp();
@@ -365,7 +358,6 @@ namespace GangsOfSouthLS.Callouts
                     DrugDealState = EDrugDealState.CanBeEnded;
                 }
             }
-
 
             if (DrugDealState == EDrugDealState.CanBeEnded)
             {
@@ -400,7 +392,6 @@ namespace GangsOfSouthLS.Callouts
                 }
             }
         }
-
 
         public override void End()
         {
@@ -478,12 +469,10 @@ namespace GangsOfSouthLS.Callouts
             base.End();
         }
 
-
         internal enum EDrugDealState
         {
             Accepted, InPreparation, EngagingSuspects, CanBeEnded, Arrived, Waiting, PlayingLogic, WaitingToLeaveScene
         }
-
 
         private void MakeDealer2DoStuff()
         {
@@ -528,7 +517,6 @@ namespace GangsOfSouthLS.Callouts
             }
         }
 
-
         private void MakeDealer1DoStuff()
         {
             if (Scenario.Dealer1.IsInAnyVehicle(false))
@@ -555,7 +543,7 @@ namespace GangsOfSouthLS.Callouts
                     {
                         Scenario.Dealer1.Tasks.EnterVehicle(Scenario.DealerCar, -1, 3f);
                         var counter = 0;
-                        while(!Scenario.Dealer1.IsInAnyVehicle(false) && counter <= 6000)
+                        while (!Scenario.Dealer1.IsInAnyVehicle(false) && counter <= 6000)
                         {
                             counter += 500;
                             GameFiber.Wait(500);
@@ -582,13 +570,11 @@ namespace GangsOfSouthLS.Callouts
             }
         }
 
-
         private void MakeDealer3DoStuff()
         {
             Game.LogTrivial("[GangsOfSouthLS] Dealer3 always fights straight away.");
             MakeFight(Scenario.Dealer3);
         }
-
 
         private void MakeBuyer1DoStuff()
         {
@@ -629,11 +615,11 @@ namespace GangsOfSouthLS.Callouts
             else
             {
                 Game.LogTrivial("[GangsOfSouthLS] Making Buyer1 enter car and wait for Buyer2");
-                GameFiber.StartNew(delegate 
+                GameFiber.StartNew(delegate
                 {
                     Scenario.Buyer1.Tasks.EnterVehicle(Scenario.BuyerCar, 0, 3f);
                     var counter = 0;
-                    while(!Scenario.Buyer1.IsInAnyVehicle(false) && counter <= 4000)
+                    while (!Scenario.Buyer1.IsInAnyVehicle(false) && counter <= 4000)
                     {
                         counter += 500;
                         GameFiber.Wait(500);
@@ -642,7 +628,7 @@ namespace GangsOfSouthLS.Callouts
                     if (Scenario.Buyer1.IsInAnyVehicle(false))
                     {
                         Game.LogTrivial("[GangsOfSouthLS] Buyer1 made it into car, waiting for Buyer2.");
-                        while(!Scenario.Buyer2.IsInAnyVehicle(false) && counter <= 6000)
+                        while (!Scenario.Buyer2.IsInAnyVehicle(false) && counter <= 6000)
                         {
                             counter += 500;
                             GameFiber.Wait(500);
@@ -653,9 +639,9 @@ namespace GangsOfSouthLS.Callouts
                             Game.LogTrivial("[GangsOfSouthLS] Both Buyers are in car, making Buyer1 shoot out of the vehicle.");
                             MyNatives.MakePedAbleToShootOutOfCar(Scenario.Buyer1);
                             MakeFight(Scenario.Buyer1);
-                            GameFiber.StartNew(delegate 
+                            GameFiber.StartNew(delegate
                             {
-                                while(Scenario.Buyer1.IsInAnyVehicle(false) && !Scenario.Buyer1.CurrentVehicle.IsSeatFree(-1) && !Scenario.Buyer1.CurrentVehicle.Driver.IsDead)
+                                while (Scenario.Buyer1.IsInAnyVehicle(false) && !Scenario.Buyer1.CurrentVehicle.IsSeatFree(-1) && !Scenario.Buyer1.CurrentVehicle.Driver.IsDead)
                                 {
                                     GameFiber.Yield();
                                 }
@@ -716,7 +702,6 @@ namespace GangsOfSouthLS.Callouts
             }
         }
 
-
         private void MakeBuyer2DoStuff()
         {
             if (DealersAndBuyersHateEachOther)
@@ -762,11 +747,10 @@ namespace GangsOfSouthLS.Callouts
             }
         }
 
-
         private void CleanUp()
         {
             var newDict = new Dictionary<Ped, Blip> { };
-            foreach(var pedblip in PedBlipDict)
+            foreach (var pedblip in PedBlipDict)
             {
                 if (pedblip.Key.Exists() && !pedblip.Key.IsDead)
                 {
@@ -781,7 +765,7 @@ namespace GangsOfSouthLS.Callouts
             }
             PedBlipDict = newDict;
             var newList = new List<Ped> { };
-            foreach(var fighter in FighterList)
+            foreach (var fighter in FighterList)
             {
                 if (fighter.Exists() && !fighter.IsDead && !Functions.IsPedArrested(fighter))
                 {
@@ -791,19 +775,17 @@ namespace GangsOfSouthLS.Callouts
             FighterList = newList;
         }
 
-
         private void MakeFight(Ped ped)
         {
             ped.Tasks.FightAgainstClosestHatedTarget(100f);
             FighterList.Add(ped);
         }
 
-
         private void AddToPursuitAndDeleteBlip(Ped ped)
         {
             PedBlipDict[ped].SafelyDelete();
             Functions.AddPedToPursuit(Pursuit, ped);
-            if(!playerAddedToPursuit)
+            if (!playerAddedToPursuit)
             {
                 playerAddedToPursuit = true;
                 Game.LogTrivial("[GangsOfSouthLS] Setting Pursuit as active for player");
@@ -816,7 +798,6 @@ namespace GangsOfSouthLS.Callouts
             }
             HasAnyPedBeenAddedToPursuit = true;
         }
-
 
         private bool IsPlayerTooCloseToSuspects()
         {
@@ -859,7 +840,7 @@ namespace GangsOfSouthLS.Callouts
 
         private bool HaveCopsArrived()
         {
-            foreach(var waypoint in Scenario.CopCarWayPointList)
+            foreach (var waypoint in Scenario.CopCarWayPointList)
             {
                 if (Scenario.CopCar1.DistanceTo(waypoint.endPoint.Position) < 5f)
                 {

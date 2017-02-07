@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using Rage;
+﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using GangsOfSouthLS.Scenarios.DrugDealScenarios;
-using GangsOfSouthLS.HelperClasses.CommonUtilities;
+using Rage;
+using System.Collections.Generic;
 
 namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
-    class DrugDealScenarioScheme
+    internal class DrugDealScenarioScheme
     {
         private string name;
         private Vector3 position;
@@ -30,7 +30,6 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             this.badGuyCarSpawnPos4List = BadGuyCarSpawnPos4List;
             this.badGuyPedSpawnPos4List = BadGuyPedSpawnPos4List;
             this.position = Position;
-
         }
 
         internal List<CopCarBuild> CopCarBuildList { get { return copCarBuildList; } }
@@ -40,8 +39,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         internal string Name { get { return name; } }
         internal Vector3 Position { get { return position; } }
 
-
-        internal static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme )
+        internal static bool ChooseScenario(out DrugDealScenarioScheme scenarioScheme)
         {
             var playerPos = Game.LocalPlayer.Character.Position;
             var schemeList = DrugDealScenarioSchemes.ScenarioSchemeList;

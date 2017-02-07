@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using Rage;
 using Rage.Native;
-using GangsOfSouthLS.HelperClasses.CommonUtilities;
+using System.Collections.Generic;
 
 namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
-    class DrugDealScenario
+    internal class DrugDealScenario
     {
         private string name;
         private Vector3 position;
@@ -20,9 +20,10 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         private Vehicle copCar1;
         private Vehicle copCar2;
 
-        private List<string> buyerCarStringList = new List<string> { "Emperor", "Primo", "Stanier", "Seminole", "Landstalker", "Cavalcade", "Bison" , "Oracle", "Asterope", "Fugitive", "Asea", "Ingot", "Premier", "Stratum", "Washington"};
+        private List<string> buyerCarStringList = new List<string> { "Emperor", "Primo", "Stanier", "Seminole", "Landstalker", "Cavalcade", "Bison", "Oracle", "Asterope", "Fugitive", "Asea", "Ingot", "Premier", "Stratum", "Washington" };
         private List<string> dealerCarStringList = new List<string> { "Buccaneer", "Tornado", "Chino", "Dukes", "Stalion", "Phoenix", "Sabregt", "Vigero", "Peyote", "Ruiner", "Virgo" };
         private List<string> dealerVanStringList = new List<string> { "Speedo", "Burrito3", "Youga" };
+
         private Dictionary<List<string>, string> badBoyPedStringListDict = new Dictionary<List<string>, string>
         {
             { new List<string> { "g_m_y_ballaeast_01" , "g_m_y_ballaorig_01", "g_m_y_ballasout_01" }, "AFRICAN_AMERICAN_GANG" },
@@ -30,8 +31,9 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             { new List<string> { "g_m_y_lost_01", "g_m_y_lost_02", "g_m_y_lost_03" }, "BIKER_GANG" },
             { new List<string> { "g_m_y_mexgang_01", "g_m_y_mexgoon_01", "g_m_y_mexgoon_02", "g_m_y_mexgoon_03" } , "MEXICAN_GANG" }
         };
+
         private List<string> badBoyPistolList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
-        private List<string> badBoyBigGunList = new List<string> { "weapon_assaultrifle", "weapon_pumpshotgun", "weapon_sawnoffshotgun", "weapon_smg"};
+        private List<string> badBoyBigGunList = new List<string> { "weapon_assaultrifle", "weapon_pumpshotgun", "weapon_sawnoffshotgun", "weapon_smg" };
 
         private List<Ped> dealerList;
         private List<Ped> buyerList;
@@ -39,7 +41,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         private Dictionary<Vehicle, CopCarWayPoint> copCarDict;
         private List<Ped> copList1;
         private List<Ped> copList2;
-        
+
         private List<CopCarBuild> copCarBuildList;
         private List<CopCarWayPoint> copCarWayPointList;
 
@@ -101,10 +103,9 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         internal string DealerGangNameString { get { return dealerGangNameString; } }
         internal string BuyerGangNameString { get { return buyerGangNameString; } }
 
-
         internal void Initialize()
         {
-            GameFiber.StartNew(delegate 
+            GameFiber.StartNew(delegate
             {
                 Game.LogTrivial(string.Format("[GangsOfSouthLS] Initializing {0}", name));
                 foreach (var entity in World.GetEntities(position, 100f, GetEntitiesFlags.ConsiderAllPeds | GetEntitiesFlags.ConsiderAllVehicles | GetEntitiesFlags.ExcludePlayerPed | GetEntitiesFlags.ExcludePlayerVehicle))
@@ -126,9 +127,8 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
                 buyer1.Tasks.PlayAnimation("amb@world_human_drug_dealer_hard@male@idle_a", "idle_c", 4f, AnimationFlags.Loop);
                 buyer2.Tasks.PlayAnimation("amb@world_human_drug_dealer_hard@male@idle_a", "idle_b", 2f, AnimationFlags.Loop);
                 return;
-            });            
+            });
         }
-
 
         private List<Vehicle> MakeBadBoyCarList()
         {
@@ -141,9 +141,9 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             list.Add(dealerCar);
             buyerCar = buyerCarSpawnPos4.CreateVehicle(buyerCarStringList.RandomElement());
             list.Add(buyerCar);
-            if(World.DateTime.Hour >= 18 || World.DateTime.Hour < 6)
+            if (World.DateTime.Hour >= 18 || World.DateTime.Hour < 6)
             {
-                foreach(var veh in list)
+                foreach (var veh in list)
                 {
                     NativeFunction.Natives.SetVehicleLights(veh, 3);
                     veh.IsPersistent = true;
@@ -151,7 +151,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             }
             else
             {
-                foreach(var veh in list)
+                foreach (var veh in list)
                 {
                     veh.IsEngineOn = true;
                     veh.IsPersistent = true;
@@ -161,31 +161,29 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             return list;
         }
 
-
         internal Dictionary<Vehicle, CopCarWayPoint> MakeCopCarDict(CopCarWayPoint WayPoint1, CopCarWayPoint WayPoint2)
         {
             var Dict = new Dictionary<Vehicle, CopCarWayPoint> { };
             Dict.Add(copCar1, WayPoint1);
             Dict.Add(copCar2, WayPoint2);
-            foreach(var veh in Dict.Keys)
+            foreach (var veh in Dict.Keys)
             {
                 veh.IsPersistent = true;
             }
             return Dict;
         }
 
-
         internal Vehicle MakeCopCarDictVehicleAndOccupy(CopCarWayPoint waypoint, CopCarBuild build)
         {
             Game.LogTrivial(string.Format("[GangsOfSouthLS] Spawned {0} at {1}.", build.carName, waypoint.description));
             var veh = waypoint.startPoint.CreateVehicle(build.carName);
-            foreach(var seat in build.seatIndicesToOccupy)
+            foreach (var seat in build.seatIndicesToOccupy)
             {
                 var cop = new Ped(build.pedNameList.RandomElement(), Vector3.Zero, 0f);
                 cop.RandomizeVariation();
                 var weaponDictEntry = build.weaponDict.RandomElement();
                 cop.Inventory.GiveNewWeapon(weaponDictEntry.Key, 999, true);
-                foreach(var component in weaponDictEntry.Value)
+                foreach (var component in weaponDictEntry.Value)
                 {
                     cop.Inventory.AddComponentToWeapon(weaponDictEntry.Key, component);
                 }

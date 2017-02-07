@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Rage;
 
 namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 {
@@ -83,7 +83,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void SafelyDelete(this Entity entity)
         {
-            if(entity.Exists())
+            if (entity.Exists())
             {
                 entity.Delete();
             }
@@ -91,7 +91,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void SafelyDelete(this Blip blip)
         {
-            if(blip.Exists())
+            if (blip.Exists())
             {
                 blip.Delete();
             }

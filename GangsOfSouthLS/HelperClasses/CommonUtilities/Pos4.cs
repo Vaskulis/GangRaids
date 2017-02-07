@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
-using Rage;
 using System.Globalization;
 
 namespace GangsOfSouthLS.HelperClasses.CommonUtilities
@@ -9,18 +9,15 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
     {
         private Vector4 posandheading;
 
-
         internal Pos4(float x, float y, float z, float head)
         {
             posandheading = new Vector4(x, y, z, head);
         }
 
-
         internal Pos4(Vector3 pos, float head)
         {
             posandheading = new Vector4(pos, head);
         }
-
 
         internal Pos4(string[] strarray)
         {
@@ -42,7 +39,6 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
             posandheading = new Vector4(fltlist[0], fltlist[1], fltlist[2], fltlist[3]);
         }
 
-
         internal Ped CreatePed(Model model)
         {
             return new Ped(model, this.Position, this.Heading);
@@ -59,14 +55,11 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
             return newPos4;
         }
 
-        
-
         internal float X
         {
             get { return posandheading.X; }
             set { posandheading.X = value; }
         }
-
 
         internal float Y
         {
@@ -74,20 +67,17 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
             set { posandheading.Y = value; }
         }
 
-
         internal float Z
         {
             get { return posandheading.Z; }
             set { posandheading.Z = value; }
         }
 
-
         internal float Heading
         {
             get { return posandheading.W; }
             set { posandheading.W = value; }
         }
-
 
         internal Vector3 Position
         {

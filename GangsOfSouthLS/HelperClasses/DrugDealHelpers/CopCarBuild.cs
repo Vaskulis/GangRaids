@@ -2,7 +2,7 @@
 
 namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
-    class CopCarBuild
+    internal class CopCarBuild
     {
         private string CarName;
         private List<int> SeatIndicesToOccupy;
@@ -16,7 +16,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             this.WeaponDict = weaponDict;
             this.SeatIndicesToOccupy = seatIndicesToOccupy;
         }
-        
+
         internal string carName { get { return CarName; } }
         internal List<int> seatIndicesToOccupy { get { return SeatIndicesToOccupy; } }
         internal List<string> pedNameList { get { return PedNameList; } }

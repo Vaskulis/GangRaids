@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Rage;
+using System.Collections.Generic;
 
 namespace GangsOfSouthLS.INIFile
 {
@@ -12,6 +13,8 @@ namespace GangsOfSouthLS.INIFile
         internal static string UnitName;
 
         internal static bool RequestAirSupport;
+
+        internal static List<string> UnmarkedCarList;
 
         internal static bool LoadINIFile()
         {
@@ -26,6 +29,7 @@ namespace GangsOfSouthLS.INIFile
             SetMenuModifierKey();
             SetUnitName();
             SetDrugDealOptions();
+            SetProtectionRacketeeringOptions();
             return true;
         }
 
@@ -86,9 +90,20 @@ namespace GangsOfSouthLS.INIFile
                 UnitName += ("BEAT_" + BeatString);
             }
         }
+
         private static void SetDrugDealOptions()
         {
             RequestAirSupport = IniFile.ReadBoolean("DRUGDEAL-CALLOUT", "RequestAirSupport", true);
+        }
+
+        private static void SetProtectionRacketeeringOptions()
+        {
+            var UnmarkedCarListString = IniFile.ReadString("[PROTECTIONRACKETEERING-CALLOUT]", "UnmarkedCarList", "POLICE4, FBI, FBI2");
+            UnmarkedCarList = new List<string> { };
+            foreach (var car in UnmarkedCarListString.Replace(" ", string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                UnmarkedCarList.Add(car.ToLower());
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
 namespace GangsOfSouthLS.Menus
 {
-    class DrugDealMenu
+    static class DrugDealMenu
     {
         private static UIMenu DrugDealPositionMenu;
         private static UIMenuListItem copCar1ListItem;

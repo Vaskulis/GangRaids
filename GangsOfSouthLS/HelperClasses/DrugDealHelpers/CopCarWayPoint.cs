@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rage;
-using GangsOfSouthLS.HelperClasses.CommonUtilities;
+﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 
 namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
-    class CopCarWayPoint
+    internal class CopCarWayPoint
     {
         private string Description;
         private Pos4 StartPoint;

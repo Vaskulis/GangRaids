@@ -80,6 +80,7 @@
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarWayPoint.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\DrugDealScenario.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\DrugDealScenarioScheme.cs" />
+    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringConversation.cs" />
     <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringScenario.cs" />
     <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringScenarioScheme.cs" />
     <Compile Include="HelperClasses\CommonUtilities\Pos4.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenarios\DrugDealScenarios\CopCarBuilds.cs" />
     <Compile Include="Scenarios\DrugDealScenarios\DrugDealScenarioSchemes.cs" />
+    <Compile Include="Scenarios\ProtectionRacketeeringScenarios\RacketConversationScheme.cs" />
     <Compile Include="Scenarios\ProtectionRacketeeringScenarios\ProtectionRacketeeringScenarioSchemes.cs" />
   </ItemGroup>
   <ItemGroup>
