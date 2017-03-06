@@ -1,13 +1,13 @@
-﻿using System;
-using System.Windows.Forms;
-using Rage;
+﻿using Rage;
+using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace GangsOfSouthLS.INIFile
 {
     internal static class INIReader
     {
-        private static InitializationFile IniFile;
+        private static InitializationFile iniFile;
         internal static Keys MenuKey;
         internal static Keys MenuModifierKey;
         internal static string UnitName;
@@ -18,8 +18,8 @@ namespace GangsOfSouthLS.INIFile
 
         internal static bool LoadINIFile()
         {
-            IniFile = new InitializationFile(@"Plugins/LSPDFR/GangsOfSouthLS.ini");
-            if (!IniFile.Exists())
+            iniFile = new InitializationFile(@"Plugins/LSPDFR/GangsOfSouthLS.ini");
+            if (!iniFile.Exists())
             {
                 Game.LogTrivial("[GangsOfSouthLS] Could not find INI File. Make sure you installed GangsOfSouthLS correctly. Not loading GangsOfSouthLS...");
                 Game.DisplaySubtitle("GangsOfSouthLS could not find its INI File. Make sure you installed it correctly. Not loading GangsOfSouthLS...");
@@ -35,7 +35,7 @@ namespace GangsOfSouthLS.INIFile
 
         private static void SetMenuKey()
         {
-            var keyString = IniFile.ReadString("KEYBINDS", "MenuKey");
+            var keyString = iniFile.ReadString("KEYBINDS", "MenuKey");
             if (Enum.TryParse(keyString, false, out MenuKey))
             {
                 Game.LogTrivial(string.Format("Set MenuKey to {0}", keyString));
@@ -50,7 +50,7 @@ namespace GangsOfSouthLS.INIFile
 
         private static void SetMenuModifierKey()
         {
-            var keyString = IniFile.ReadString("KEYBINDS", "MenuModifierKey");
+            var keyString = iniFile.ReadString("KEYBINDS", "MenuModifierKey");
             if (Enum.TryParse(keyString, false, out MenuModifierKey))
             {
                 Game.LogTrivial(string.Format("Set MenuKey to {0}", keyString));
@@ -65,9 +65,9 @@ namespace GangsOfSouthLS.INIFile
 
         private static void SetUnitName()
         {
-            var DivisionString = IniFile.ReadString("PERSONAL", "Division");
-            var UnitTypeString = IniFile.ReadString("PERSONAL", "UnitType");
-            var BeatString = IniFile.ReadString("PERSONAL", "Beat");
+            var DivisionString = iniFile.ReadString("PERSONAL", "Division");
+            var UnitTypeString = iniFile.ReadString("PERSONAL", "UnitType");
+            var BeatString = iniFile.ReadString("PERSONAL", "Beat");
             UnitName = "";
 
             if (DivisionString.Length == 1)
@@ -93,12 +93,12 @@ namespace GangsOfSouthLS.INIFile
 
         private static void SetDrugDealOptions()
         {
-            RequestAirSupport = IniFile.ReadBoolean("DRUGDEAL-CALLOUT", "RequestAirSupport", true);
+            RequestAirSupport = iniFile.ReadBoolean("DRUGDEAL-CALLOUT", "RequestAirSupport", true);
         }
 
         private static void SetProtectionRacketeeringOptions()
         {
-            var UnmarkedCarListString = IniFile.ReadString("[PROTECTIONRACKETEERING-CALLOUT]", "UnmarkedCarList", "POLICE4, FBI, FBI2");
+            var UnmarkedCarListString = iniFile.ReadString("[PROTECTIONRACKETEERING-CALLOUT]", "UnmarkedCarList", "POLICE4, FBI, FBI2");
             UnmarkedCarList = new List<string> { };
             foreach (var car in UnmarkedCarListString.Replace(" ", string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
             {

@@ -4,22 +4,17 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
     internal class CopCarWayPoint
     {
-        private string Description;
-        private Pos4 StartPoint;
-        private Pos4 EndPoint;
-        private string Direction;
-
         internal CopCarWayPoint(string description, Pos4 startPoint, Pos4 endPoint, string direction)
         {
-            this.Description = description;
-            this.StartPoint = startPoint;
-            this.EndPoint = endPoint;
-            this.Direction = direction;
+            Description = description;
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+            Direction = direction;
         }
 
-        internal string description { get { return Description; } }
-        internal Pos4 startPoint { get { return StartPoint; } }
-        internal Pos4 endPoint { get { return EndPoint; } }
-        internal string direction { get { return Direction; } }
+        internal string Description { get; private set; }
+        internal Pos4 StartPoint { get; private set; }
+        internal Pos4 EndPoint { get; private set; }
+        internal string Direction { get; private set; }
     }
 }

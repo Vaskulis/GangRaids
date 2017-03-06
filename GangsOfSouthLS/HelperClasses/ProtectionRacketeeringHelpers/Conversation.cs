@@ -17,73 +17,76 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         InformingOfArrival,
         Surprised,
         InformingOfDeparture,
-        InformingOfDrivingPast
+        InformingOfDrivingPast,
+        Survived,
+        PursuitStillRunning
     }
 
     internal class ConversationLine
     {
-        private string talker;
-        private string line;
-        private string talkercolor;
-
-        internal ConversationLine(string Talker, string Line)
-        {
-            talker = Talker;
-            line = Line;
-            if (Talker == "Racketeer") { talkercolor = "~r~"; }
-            else if (Talker == "Shopkeeper") { talkercolor = "~o~"; }
-            else { talkercolor = ""; }
-        }
-
-        internal string TalkerColor { get { return talkercolor; } }
-        internal string Talker { get { return talker; } }
-        internal string Line { get { return line; } }
+        internal string TalkerColor { get; private set; }
+        internal string Talker { get; private set; }
+        internal string Line { get; private set; }
 
         internal int Duration
         {
             get
             {
-                return 1700 + (line.Length * 15);
+                return 1700 + (Line.Length * 15);
+            }
+        }
+
+        internal ConversationLine(string Talker, string Line)
+        {
+            this.Talker = Talker;
+            this.Line = Line;
+            if (Talker == "Racketeer")
+            {
+                TalkerColor = "~r~";
+            }
+            else if (Talker == "Shopkeeper")
+            {
+                TalkerColor = "~o~";
+            }
+            else
+            {
+                TalkerColor = "";
             }
         }
     }
 
     internal class ConversationPart
     {
-        private List<ConversationLine> lineList;
+        internal int NumberOfLines { get { return Lines.Count; } }
+        internal List<ConversationLine> Lines { get; private set; }
 
-        internal ConversationPart(List<ConversationLine> Lines)
+        internal ConversationPart(List<ConversationLine> lines)
         {
-            lineList = Lines;
+            Lines = lines;
         }
-
-        internal int NumberOfLines { get { return lineList.Count; } }
-        internal List<ConversationLine> Lines { get { return lineList; } }
     }
 
     internal class ConversationPartsCollection
     {
-        private ConversationState convState;
         private List<ConversationPart> convPartList;
 
-        internal ConversationPartsCollection(ConversationState ConvState, List<ConversationPart> ConvParts)
-        {
-            convState = ConvState;
-            convPartList = ConvParts;
-        }
-
-        internal ConversationState ConvState { get { return convState; } }
+        internal ConversationState ConvState { get; private set; }
         internal ConversationPart RandomConvPart { get { return convPartList.RandomElement(); } }
+
+        internal ConversationPartsCollection(ConversationState convState, List<ConversationPart> convParts)
+        {
+            ConvState = convState;
+            convPartList = convParts;
+        }
     }
 
     internal class Conversation
     {
-        protected Dictionary<ConversationState, ConversationPartsCollection> convPartCollectionDict;
-        protected bool finishedTalking;
-        protected bool finishedState;
-        protected bool breakConversation;
+        private Dictionary<ConversationState, ConversationPartsCollection> convPartCollectionDict;
+        private bool finishedTalking;
+        private bool breakConversation;
 
-        internal bool IsFinished { get { return finishedState; } }
+        internal bool IsFinished { get; private set; }
 
         internal Conversation(List<ConversationPartsCollection> ConvPartsCollections)
         {
@@ -97,7 +100,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
 
         internal void PlayConversationPartOfState(ConversationState ConvState, bool haltPreviousConversationPart = false)
         {
-            finishedState = false;
+            IsFinished = false;
             var convPartColl = convPartCollectionDict[ConvState];
             var convPart = convPartColl.RandomConvPart;
             GameFiber.StartNew(delegate
@@ -129,7 +132,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
                     }
                 }
                 finishedTalking = true;
-                finishedState = true;
+                IsFinished = true;
             });
         }
     }

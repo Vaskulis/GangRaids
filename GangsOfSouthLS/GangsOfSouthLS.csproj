@@ -78,21 +78,21 @@
     <Compile Include="HelperClasses\CommonUtilities\MyNatives.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarBuild.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarWayPoint.cs" />
-    <Compile Include="HelperClasses\DrugDealHelpers\DrugDealScenario.cs" />
-    <Compile Include="HelperClasses\DrugDealHelpers\DrugDealScenarioScheme.cs" />
-    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringConversation.cs" />
-    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringScenario.cs" />
-    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ProtectionRacketeeringScenarioScheme.cs" />
+    <Compile Include="HelperClasses\DrugDealHelpers\Scenario.cs" />
+    <Compile Include="HelperClasses\DrugDealHelpers\ScenarioScheme.cs" />
+    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\Conversation.cs" />
+    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\Scenario.cs" />
+    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ScenarioScheme.cs" />
     <Compile Include="HelperClasses\CommonUtilities\Pos4.cs" />
     <Compile Include="HelperClasses\CommonUtilities\UsefulFunctions.cs" />
     <Compile Include="INIFile\INIReader.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\DrugDealMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenarios\DrugDealScenarios\CopCarBuilds.cs" />
-    <Compile Include="Scenarios\DrugDealScenarios\DrugDealScenarioSchemes.cs" />
-    <Compile Include="Scenarios\ProtectionRacketeeringScenarios\RacketConversationScheme.cs" />
-    <Compile Include="Scenarios\ProtectionRacketeeringScenarios\ProtectionRacketeeringScenarioSchemes.cs" />
+    <Compile Include="Scenarios\DrugDealScenarios\CopCarBuildCollection.cs" />
+    <Compile Include="Scenarios\DrugDealScenarios\ScenarioSchemeCollection.cs" />
+    <Compile Include="Scenarios\ProtectionRacketeeringScenarios\ConversationPartCollection.cs" />
+    <Compile Include="Scenarios\ProtectionRacketeeringScenarios\ScenarioSchemeCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="INIFile\GangsOfSouthLS.ini" />

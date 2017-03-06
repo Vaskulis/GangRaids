@@ -12,8 +12,8 @@ namespace GangsOfSouthLS.Callouts
     [CalloutInfo("Drug Deal", CalloutProbability.High)]
     internal class DrugDeal : Callout
     {
-        internal static DrugDealScenario Scenario;
-        internal static DrugDealScenarioScheme ScenarioScheme;
+        internal static Scenario Scenario;
+        internal static ScenarioScheme ScenarioScheme;
         internal static Vector3 PlayerStartPosition;
         internal static Vector3 PlayerEndPosition;
         internal static string PlayerDirection;
@@ -48,16 +48,16 @@ namespace GangsOfSouthLS.Callouts
 
         public override bool OnBeforeCalloutDisplayed()
         {
-            var scenarioFound = DrugDealScenarioScheme.ChooseScenario(out ScenarioScheme);
+            var scenarioFound = ScenarioScheme.ChooseScenario(out ScenarioScheme);
             if (!scenarioFound)
             {
                 Game.LogTrivial("[GangsOfSouthLS] Could not find scenario in range.");
                 return false;
             }
-            Scenario = new DrugDealScenario(ScenarioScheme);
+            Scenario = new Scenario(ScenarioScheme);
             CalloutMessage = "Drug deal in progress";
             CalloutPosition = Scenario.Position;
-            Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_DRUGDEAL IN_OR_ON_POSITION UNITS_RESPOND_CODE_02", INIReader.UnitName), Scenario.Position);
+            Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_DRUGDEAL IN_OR_ON_POSITION UNITS_RESPOND_CODE_02_02", INIReader.UnitName), Scenario.Position);
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 70f);
             DealersAndBuyersHateEachOther = false;
             Buyer2IsFightingStraightAway = false;
@@ -93,7 +93,7 @@ namespace GangsOfSouthLS.Callouts
                 if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 200f)
                 {
                     SuspectsAreaBlip.DisableRoute();
-                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangRaids_PROCEED_WITH_CAUTION");
+                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangsOfSouthLS_PROCEED_WITH_CAUTION");
                     DrugDealState = EDrugDealState.InPreparation;
                 }
             }
@@ -152,7 +152,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     copCar1Blip = new Blip(Scenario.CopCar1);
                     copCar1Blip.Color = System.Drawing.Color.FromArgb(93, 182, 229);
-                    Scenario.CopCar1.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[Scenario.CopCar1].endPoint.Position, 10f, VehicleDrivingFlags.Emergency, 5f).WaitForCompletion(20000);
+                    Scenario.CopCar1.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[Scenario.CopCar1].EndPoint.Position, 10f, VehicleDrivingFlags.Emergency, 5f).WaitForCompletion(20000);
                     copCar1Blip.Delete();
                     copCar1arrived = true;
                     return;
@@ -161,7 +161,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     copCar2Blip = new Blip(Scenario.CopCar2);
                     copCar2Blip.Color = System.Drawing.Color.FromArgb(93, 182, 229);
-                    Scenario.CopCar2.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[Scenario.CopCar2].endPoint.Position, 10f, VehicleDrivingFlags.Emergency, 5f).WaitForCompletion(20000);
+                    Scenario.CopCar2.Driver.Tasks.DriveToPosition(Scenario.CopCarDict[Scenario.CopCar2].EndPoint.Position, 10f, VehicleDrivingFlags.Emergency, 5f).WaitForCompletion(20000);
                     copCar2Blip.Delete();
                     copCar2arrived = true;
                     return;
@@ -803,7 +803,7 @@ namespace GangsOfSouthLS.Callouts
         {
             foreach (var waypoint in Scenario.CopCarWayPointList)
             {
-                if (Game.LocalPlayer.Character.Position.DistanceTo(waypoint.endPoint.Position) < 5f)
+                if (Game.LocalPlayer.Character.Position.DistanceTo(waypoint.EndPoint.Position) < 5f)
                 {
                     return true;
                 }
@@ -842,11 +842,11 @@ namespace GangsOfSouthLS.Callouts
         {
             foreach (var waypoint in Scenario.CopCarWayPointList)
             {
-                if (Scenario.CopCar1.DistanceTo(waypoint.endPoint.Position) < 5f)
+                if (Scenario.CopCar1.DistanceTo(waypoint.EndPoint.Position) < 5f)
                 {
                     return true;
                 }
-                if (Scenario.CopCar2.DistanceTo(waypoint.endPoint.Position) < 5f)
+                if (Scenario.CopCar2.DistanceTo(waypoint.EndPoint.Position) < 5f)
                 {
                     return true;
                 }

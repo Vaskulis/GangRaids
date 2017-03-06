@@ -1,13 +1,9 @@
 ﻿using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
 {
-    static class RacketConversationScheme
+    internal static class ConversationPartCollection
     {
         private static ConversationPartsCollection StartConversationParts = new ConversationPartsCollection(ConversationState.Start, new List<ConversationPart>
         {
@@ -189,7 +185,6 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
                 new ConversationLine("Shopkeeper", "Help me! Get me out of here!"),
                 new ConversationLine("Racketeer", "You're bugged! What the hell?")
             }),
-
         });
 
         private static ConversationPartsCollection InformingOfArrivalConversationParts = new ConversationPartsCollection(ConversationState.InformingOfArrival, new List<ConversationPart>
@@ -248,6 +243,30 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             }),
         });
 
+        private static ConversationPartsCollection PursuitStillRunningConversationParts = new ConversationPartsCollection(ConversationState.PursuitStillRunning, new List<ConversationPart>
+        {
+            new ConversationPart(new List<ConversationLine>
+            {
+                new ConversationLine("Shopkeeper", "What are you standing here for? Get after them!")
+            }),
+            new ConversationPart(new List<ConversationLine>
+            {
+                new ConversationLine("Shopkeeper", "Are you kidding me? Shouldn't you be going after them?"),
+            })
+        });
+
+        private static ConversationPartsCollection SurvivedConversationParts = new ConversationPartsCollection(ConversationState.Survived, new List<ConversationPart>
+        {
+            new ConversationPart(new List<ConversationLine>
+            {
+                new ConversationLine("Shopkeeper", "You saved my life! Thank you so much!")
+            }),
+            new ConversationPart(new List<ConversationLine>
+            {
+                new ConversationLine("Shopkeeper", "I'm so glad it's finally over!")
+            })
+        });
+
         internal static List<ConversationPartsCollection> ConverstaionPartsCollections = new List<ConversationPartsCollection>
         {
             StartConversationParts,
@@ -261,7 +280,9 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             InformingOfArrivalConversationParts,
             SurprisedConversationParts,
             InformingOfDrivingPastConversationParts,
-            InformingOfDepartureConversationParts
+            InformingOfDepartureConversationParts,
+            PursuitStillRunningConversationParts,
+            SurvivedConversationParts
         };
     }
 }

@@ -1,4 +1,5 @@
-﻿using Rage;
+﻿using LSPD_First_Response.Mod.API;
+using Rage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,6 +124,25 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
                 newplate += numbers.RandomElement();
             }
             vehicle.LicensePlate = newplate;
+        }
+
+        internal static bool SafelyIsDeadOrArrested(this Ped ped, bool testGettingArrested = false)
+        {
+            if (testGettingArrested)
+            {
+                if (!ped.Exists() || ped.IsDead || Functions.IsPedArrested(ped) || Functions.IsPedGettingArrested(ped))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (!ped.Exists() || ped.IsDead || Functions.IsPedArrested(ped))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

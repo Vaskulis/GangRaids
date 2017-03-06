@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using GangsOfSouthLS.HelperClasses;
+﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using Rage;
-using GangsOfSouthLS.HelperClasses.CommonUtilities;
+using System.Collections.Generic;
 
 namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
 {
-    static class DrugDealScenarioSchemes
+    internal static class ScenarioSchemeCollection
     {
-        internal static DrugDealScenarioScheme Scenario1 = new DrugDealScenarioScheme
+        internal static ScenarioScheme Scenario1 = new ScenarioScheme
         (
             "Scenario1",
             new List<CopCarWayPoint>
@@ -41,7 +40,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(859.6678f, -1057.579f, 28.01464f)
         );
 
-        internal static DrugDealScenarioScheme Scenario2 = new DrugDealScenarioScheme
+        internal static ScenarioScheme Scenario2 = new ScenarioScheme
         (
             "Scenario2",
             new List<CopCarWayPoint>
@@ -74,7 +73,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(251.9744f, -1976.815f, 21.21008f)
         );
 
-        internal static DrugDealScenarioScheme Scenario3 = new DrugDealScenarioScheme
+        internal static ScenarioScheme Scenario3 = new ScenarioScheme
         (
             "Scenario3",
             new List<CopCarWayPoint>
@@ -107,7 +106,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(148.6301f, -1506.425f, 28.76328f)
         );
 
-        internal static DrugDealScenarioScheme Scenario4 = new DrugDealScenarioScheme
+        internal static ScenarioScheme Scenario4 = new ScenarioScheme
         (
             "Scenario4",
             new List<CopCarWayPoint>
@@ -140,7 +139,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(-240.4324f, -1644.087f, 33.05951f)
         );
 
-        internal static DrugDealScenarioScheme Scenario5 = new DrugDealScenarioScheme
+        internal static ScenarioScheme Scenario5 = new ScenarioScheme
         (
             "Scenario5",
             new List<CopCarWayPoint>
@@ -173,9 +172,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(459.4813f, -1516.511f, 28.8147f)
         );
 
-
-
-        internal static List<DrugDealScenarioScheme> ScenarioSchemeList = new List<DrugDealScenarioScheme>
+        internal static List<ScenarioScheme> ScenarioSchemeList = new List<ScenarioScheme>
         {
             Scenario1,
             Scenario2,
