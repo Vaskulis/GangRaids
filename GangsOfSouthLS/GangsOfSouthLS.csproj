@@ -49,6 +49,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ComputerPlus">
+      <HintPath>..\..\..\..\Dependencies\ComputerPlus.dll</HintPath>
+    </Reference>
     <Reference Include="LSPD First Response">
       <HintPath>..\..\..\..\Dependencies\LSPD First Response.dll</HintPath>
     </Reference>
@@ -73,9 +76,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIWrappers\ComputerPlusWrapperClass.cs" />
+    <Compile Include="APIWrappers\DependencyPluginCheck.cs" />
+    <Compile Include="APIWrappers\LSPDFRPlusWrapperClass.cs" />
     <Compile Include="Callouts\DrugDeal.cs" />
     <Compile Include="Callouts\ProtectionRacketeering.cs" />
     <Compile Include="HelperClasses\CommonUtilities\MyNatives.cs" />
+    <Compile Include="HelperClasses\CommonUtilities\MyPed.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarBuild.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarWayPoint.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\Scenario.cs" />

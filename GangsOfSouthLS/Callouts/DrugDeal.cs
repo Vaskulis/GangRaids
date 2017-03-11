@@ -783,7 +783,10 @@ namespace GangsOfSouthLS.Callouts
 
         private void AddToPursuitAndDeleteBlip(Ped ped)
         {
-            PedBlipDict[ped].SafelyDelete();
+            if (PedBlipDict.ContainsKey(ped))
+            {
+                PedBlipDict[ped].SafelyDelete();
+            }
             Functions.AddPedToPursuit(Pursuit, ped);
             if (!playerAddedToPursuit)
             {

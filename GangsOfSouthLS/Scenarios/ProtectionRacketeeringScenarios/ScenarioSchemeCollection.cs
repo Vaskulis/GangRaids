@@ -9,7 +9,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
     {
         private static ScenarioScheme Scenario1 = new ScenarioScheme
         (
-            "Strawberry 247 Supermarket",
+            "247 Supermarket",
             new Pos4(25.02721f, -1342.898f, 29.49704f, 221.721f),
             new Pos4(27.09624f, -1345.195f, 29.49704f, 40.14472f),
             new List<string> { "s_f_m_sweatshop_01", "mp_m_shopkeep_01" },
@@ -41,7 +41,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
 
         private static ScenarioScheme Scenario3 = new ScenarioScheme
         (
-            "Strawberry Discount Store",
+            "Discount Store",
             new Pos4(75.82664f, -1390.549f, 29.37615f, 258.0114f),
             new Pos4(78.53907f, -1391.068f, 29.37614f, 81.13006f),
             new List<string> { "s_f_y_shop_low", "s_f_y_shop_mid" },
@@ -57,7 +57,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
 
         private static ScenarioScheme Scenario4 = new ScenarioScheme
         (
-            "Davis LTD Gas Station",
+            "LTD Gas Station",
             new Pos4(-44.41323f, -1754.978f, 29.42101f, 86.94448f),
             new Pos4(-47.73475f, -1755.601f, 29.42101f, 282.1713f),
             new List<string> { "mp_m_shopkeep_01" },
@@ -65,7 +65,8 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             new List<string> { "V_ILEV_GASDOOR", "V_ILEV_GASDOOR_R" },
             new List<CarWaypointCollection>
             {
-                        new CarWaypointCollection(new Pos4(38.32006f, -1877.808f, 21.71684f, 51.08133f), new Pos4(-69.93227f, -1777.064f, 27.84576f, 344.2718f), new Pos4(-63.52161f, -1753.819f, 28.63155f, 5.56369f)),
+                new CarWaypointCollection(new Pos4(14.91175f, -1858.353f, 23.26474f, 49.28803f), new Pos4(-70.68081f, -1774.917f, 28.28212f, 339.2733f), new Pos4(-63.68183f, -1756.185f, 28.85799f, 341.4409f)),
+                new CarWaypointCollection(new Pos4(-196.0932f, -1808.285f, 29.42108f, 300.8298f), new Pos4(-70.68081f, -1774.917f, 28.28212f, 339.2733f), new Pos4(-63.68183f, -1756.185f, 28.85799f, 341.4409f)),
             },
             "NONE"
         );
@@ -73,9 +74,9 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
         internal static List<ScenarioScheme> ScenarioSchemeList = new List<ScenarioScheme>
         {
             Scenario1,
-            //Scenario2,
-            //Scenario3,
-            //Scenario4
+            Scenario2,
+            Scenario3,
+            Scenario4
         };
     }
 }
