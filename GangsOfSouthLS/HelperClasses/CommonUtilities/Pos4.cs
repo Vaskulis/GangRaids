@@ -44,9 +44,16 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
             return new Ped(model, this.Position, this.Heading);
         }
 
+        internal MyPed CreateMyPed(Model model)
+        {
+            return new MyPed(model, this.Position, this.Heading);
+        }
+
         internal Vehicle CreateVehicle(Model model)
         {
-            return new Vehicle(model, this.Position, this.Heading);
+            var returnveh = new Vehicle(model, this.Position, this.Heading);
+            returnveh.RandomizePlate();
+            return returnveh;
         }
 
         internal Pos4 Copy()

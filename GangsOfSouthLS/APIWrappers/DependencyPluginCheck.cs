@@ -12,18 +12,25 @@ namespace GangsOfSouthLS.APIWrappers
     {
         internal static bool IsLSPDFRPluginRunning(string Plugin, Version minversion = null)
         {
-            foreach (Assembly assembly in Functions.GetAllUserPlugins())
+            try
             {
-                AssemblyName an = assembly.GetName();
-                if (an.Name.ToLower() == Plugin.ToLower())
+                foreach (Assembly assembly in Functions.GetAllUserPlugins())
                 {
-                    if (minversion == null || an.Version.CompareTo(minversion) >= 0)
+                    AssemblyName an = assembly.GetName();
+                    if (an.Name.ToLower() == Plugin.ToLower())
                     {
-                        return true;
+                        if (minversion == null || an.Version.CompareTo(minversion) >= 0)
+                        {
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
-            return false;
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ using Rage;
 
 namespace GangsOfSouthLS.APIWrappers
 {
-    class ComputerPlusWrapperClass
+    static class ComputerPlusWrapperClass
     {
         public static Guid CreateCallout(string CallName, string ShortName, Vector3 Location, EResponseType ResponseType, string Description = "", ECallStatus CallStatus = ECallStatus.Created, List<Ped> CallPeds = null, List<Vehicle> CallVehicles = null)
         {

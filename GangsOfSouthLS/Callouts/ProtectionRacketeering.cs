@@ -12,7 +12,7 @@ using GangsOfSouthLS.APIWrappers;
 
 namespace GangsOfSouthLS.Callouts
 {
-    [CalloutInfo("Drug Deal", CalloutProbability.Always)]
+    [CalloutInfo("Protection Racketeering", CalloutProbability.High)]
     internal class ProtectionRacketeering : Callout
     {
         internal static Scenario Scenario;
@@ -36,11 +36,12 @@ namespace GangsOfSouthLS.Callouts
         private bool endDeletingStockMerchant = false;
         private bool gangstersSeePlayer = false;
         private bool glueCar = false;
+        private bool merchantdead = false;
         private Conversation RacketConversation;
         private bool isLSPDFRPlusRunning;
         private bool isComputerPlusRunning;
         private Guid callID;
-        private List<MyPed> Suspectlist;
+        private List<MyPed> Suspectlist = new List<MyPed> { };
 
         public override bool OnBeforeCalloutDisplayed()
         {
@@ -51,22 +52,19 @@ namespace GangsOfSouthLS.Callouts
                 return false;
             }
             Scenario = new Scenario(ScenarioScheme);
+            Suspectlist = new List<MyPed> { };
             RacketConversation = new Conversation(ConversationPartCollection.ConverstaionPartsCollections);
             CalloutMessage = "Protection Racketeering ~w~at ~y~" + Scenario.Name;
             CalloutPosition = Scenario.Position;
-            GameFiber.StartNew(delegate
+            if (!(Scenario.ShopNameString == "NONE"))
             {
-                if (!(Scenario.ShopNameString == "NONE"))
-                {
-                    Functions.PlayScannerAudio(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT AT {1} UNITS_RESPOND_CODE_02_02", INIReader.UnitName, Scenario.ShopNameString));
-                }
-                else
-                {
-                    Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT IN_OR_ON_POSITION UNITS_RESPOND_CODE_02_02", INIReader.UnitName), CalloutPosition);
-                }
-                GameFiber.Wait(6000);
-                Functions.PlayScannerAudio("SUSPECTS_ARE_MEMBERS_OF " + Scenario.GangNameString);
-            });
+                Functions.PlayScannerAudio(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT AT {1} SUSPECTS_ARE_MEMBERS_OF {2} UNITS_RESPOND_CODE_02_02", INIReader.UnitName, Scenario.ShopNameString, Scenario.GangNameString));
+            }
+            else
+            {
+                Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT IN_OR_ON_POSITION SUSPECTS_ARE_MEMBERS_OF {1} UNITS_RESPOND_CODE_02_02", INIReader.UnitName, Scenario.GangNameString), CalloutPosition);
+            }
+            Functions.PlayScannerAudio("SUSPECTS_ARE_MEMBERS_OF " + Scenario.GangNameString);
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 80f);
             isComputerPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("ComputerPlus", new Version("1.3.0.0"));
             isLSPDFRPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("LSPDFR+", new Version("1.4.1.0"));
@@ -222,18 +220,21 @@ namespace GangsOfSouthLS.Callouts
                 {
                     ComputerPlusWrapperClass.AddPedToCallout(callID, Scenario.Passenger);
                 }
-                if (Scenario.Merchant.Exists() && Scenario.Merchant.IsAlive)
-                {
-                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "The shopkeeper is alive and well.");
-                }
-                else
-                {
-                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "The shopkeeper did not survive.");
-                }
             }
             if (!endingregularly)
             {
                 Game.LogTrivial("[GangsOfSouthLS] NOT ending callout regularly.");
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.CancelCallout(callID);
+                }
+            }
+            else
+            {
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.ConcludeCallout(callID);
+                }
             }
             EndDoorCheck();
             EndVisibleCheck();
@@ -288,10 +289,6 @@ namespace GangsOfSouthLS.Callouts
         //BEGIN
         internal void DoIfStateAccepted()
         {
-            if (firstloop)
-            {
-                firstloop = false;
-            }
             if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 100f)
             {
                 RacketState = ERacketState.ArrivedOnScene;
@@ -342,7 +339,7 @@ namespace GangsOfSouthLS.Callouts
                 if (isComputerPlusRunning)
                 {
                     ComputerPlusWrapperClass.SetCalloutStatusToAtScene(callID);
-                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Officer arrived at scene.");
+                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Officer arrived at the scene.");
                 }
                 Game.LogTrivial("[GangsOfSouthLS] Player arrived on scene.");
                 firstloop = false;
@@ -355,6 +352,8 @@ namespace GangsOfSouthLS.Callouts
                 {
                     GameFiber.Wait(TimeBeforeCarSpawn);
                     Scenario.SpawnCarAndBadGuys();
+                    Scenario.Passenger.AddCrimeToList("Extortion", 0);
+                    Scenario.Driver.AddCrimeToList("Extortion", 0);
                     StartVisibleCheck();
                     Suspectlist = new List<MyPed> { Scenario.Passenger, Scenario.Driver };
                     RacketState = ERacketState.GangstersDrivingToShop;
@@ -409,14 +408,17 @@ namespace GangsOfSouthLS.Callouts
                     }
                     if (RacketState == ERacketState.GangstersDrivingToShop)
                     {
+                        Game.LogTrivial("[GangsOfSouthLS] Driving to waypoint, 8, 3");
                         Scenario.Driver.Tasks.DriveToPosition(Scenario.CarWaypointPos4.Position, 8f, VehicleDrivingFlags.Normal | VehicleDrivingFlags.AllowMedianCrossing, 3f).WaitForCompletion(40000);
                     }
                     if (RacketState == ERacketState.GangstersDrivingToShop)
                     {
+                        Game.LogTrivial("[GangsOfSouthLS] Driving to parking, 5, 10");
                         Scenario.Driver.Tasks.DriveToPosition(Scenario.ParkingPos4.Position, 5f, VehicleDrivingFlags.Normal | VehicleDrivingFlags.AllowMedianCrossing, 10f).WaitForCompletion(30000);
                     }
                     if (RacketState == ERacketState.GangstersDrivingToShop)
                     {
+                        Game.LogTrivial("[GangsOfSouthLS] Parking.");
                         Scenario.Driver.Tasks.ParkVehicle(Scenario.ParkingPos4.Position, Scenario.ParkingPos4.Heading).WaitForCompletion(30000);
                         var absheadingdiff = 0f;
                         GameFiber.StartNew(delegate
@@ -446,7 +448,7 @@ namespace GangsOfSouthLS.Callouts
                         else
                         {
                             Game.LogTrivial("[GangsOfSouthLS] Car didn't make it for some reason, aborting callout.");
-                            Game.DisplayNotification("~r~GangsOfSouthLS: The car didn't make it to the shop for some reason, aborting the callout. Please report this error!");
+                            Game.DisplayNotification("~r~GangsOfSouthLS: The car didn't make it to the shop for some reason, aborting the callout. If you are not sure what caused this, please report this error!");
                             End();
                         }
                     }
@@ -516,6 +518,8 @@ namespace GangsOfSouthLS.Callouts
             {
                 firstloop = false;
                 RacketConversation.PlayConversationPartOfState(ConversationState.Start);
+                Scenario.Passenger.AddCrimeToList("Extortion", 84);
+                Scenario.Driver.AddCrimeToList("Extortion", 84);
             }
             if (RacketConversation.IsFinished)
             {
@@ -568,6 +572,7 @@ namespace GangsOfSouthLS.Callouts
             {
                 firstloop = false;
                 RacketConversation.PlayConversationPartOfState(ConversationState.RefusingToGiveMoney);
+                Scenario.Passenger.AddCrimeToList("Extortion", 36);
             }
             if (RacketConversation.IsFinished)
             {
@@ -752,7 +757,7 @@ namespace GangsOfSouthLS.Callouts
                         }
                     });
                     Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                    Scenario.Driver.AddCrimeToList("Aggravated Assault on a police officer", 48);
+                    Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
                     while (!RacketConversation.IsFinished)
                     {
                         GameFiber.Yield();
@@ -842,7 +847,7 @@ namespace GangsOfSouthLS.Callouts
                     if (!(RacketState == ERacketState.Ending))
                     {
                         Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                        Scenario.Driver.AddCrimeToList("Aggravated Assault on a police officer", 48);
+                        Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
                         glueCar = true;
                         GameFiber.StartNew(delegate
                         {
@@ -888,11 +893,12 @@ namespace GangsOfSouthLS.Callouts
             {
                 Game.LogTrivial("[GangsOfSouthLS] Player started Pullover.");
                 CarBlip.SafelyDelete();
+                firstloop = true;
                 RacketState = ERacketState.InPullover;
             }
             if (Functions.IsPedGettingArrested(Scenario.Driver))
             {
-                MakeStuffHappenWhenArrestingTheDriver();
+                MakeStuffHappenWhenArrestingDuringPullover();
             }
         }
 
@@ -931,13 +937,14 @@ namespace GangsOfSouthLS.Callouts
                 }
                 else
                 {
+                    firstloop = false;
                     Game.LogTrivial("[GangsOfSouthLS] Allowing the Player to arrest both.");
                     RacketState = ERacketState.ArrestingBoth;
                 }
-                if (Functions.IsPedGettingArrested(Scenario.Driver))
-                {
-                    MakeStuffHappenWhenArrestingTheDriver();
-                }
+            }
+            if (Functions.IsPedGettingArrested(Scenario.Driver) || Functions.IsPedGettingArrested(Scenario.Passenger))
+            {
+                MakeStuffHappenWhenArrestingDuringPullover();
             }
         }
 
@@ -1022,29 +1029,27 @@ namespace GangsOfSouthLS.Callouts
                         {
                             Game.LogTrivial("[GangsOfSouthLS] Making the driver cruise around and playing ConversationState.InformingOfDrivingPast.");
                             RacketConversation.PlayConversationPartOfState(ConversationState.InformingOfDrivingPast);
-                            Scenario.Driver.SafelyDismiss();
-                            Scenario.Passenger.SafelyDismiss();
                             Scenario.Driver.Tasks.CruiseWithVehicle(12f);
                         }
                         while (!(RacketState == ERacketState.Ending) && !RacketConversation.IsFinished)
                         {
                             GameFiber.Yield();
                         }
-                        GameFiber.StartNew(delegate
-                        {
-                            Game.DisplayHelp("The gangsters saw you and decided not to pay a visit to the shopkeeper.", 5000);
-                            GameFiber.Wait(5000);
-                            Game.DisplayHelp("You could still pull them over and arrest them, but without any proof of their racket, they'll be free again soon.", 5000);
-                            GameFiber.Wait(5000);
-                            Game.DisplayHelp("They are going to remember what the shopkeeper tried to do...", 5000);
-                        });
-                        if (!(RacketState == ERacketState.Ending))
-                        {
-                            endingregularly = true;
-                            End();
-                        }
+                        Game.DisplayHelp("The gangsters saw you and decided not to pay a visit to the shopkeeper.", 5000);
+                        GameFiber.Wait(5000);
+                        Game.DisplayHelp("You could still pull them over and arrest them, but without any proof of their racket, they'll be free again soon.", 5000);
+                        GameFiber.Wait(5000);
+                        Game.DisplayHelp("They are going to remember what the shopkeeper tried to do...", 5000);
                     });
                 }
+            }
+            if (!(RacketState == ERacketState.Ending) && AreTheGangstersGone())
+            {
+                Game.LogTrivial("[GangsOfSouthLS] Player left the vicinity of the gangsters, ending callout.");
+                Scenario.Driver.SafelyDismiss();
+                Scenario.Passenger.SafelyDismiss();
+                endingregularly = true;
+                End();
             }
         }
 
@@ -1112,25 +1117,27 @@ namespace GangsOfSouthLS.Callouts
             var newList = new List<MyPed> { };
             foreach (var suspect in Suspectlist)
             {
-                if (!suspect.Exists() || suspect.IsDead)
+                if (!suspect.Exists())
+                {
+                    continue;
+                }
+                else if (suspect.IsDead)
                 {
                     if (isComputerPlusRunning)
                     {
+                        ComputerPlusWrapperClass.AddPedToCallout(callID, suspect);
                         ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("Suspect {0} was killed.", Functions.GetPersonaForPed(suspect).FullName));
                     }
-                    Suspectlist.Remove(suspect);
-                    break;
+                    suspect.SafelyDismiss();
                 }
                 else if (Functions.IsPedArrested(suspect))
                 {
                     if (isComputerPlusRunning)
                     {
+                        ComputerPlusWrapperClass.AddPedToCallout(callID, suspect);
                         ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("Suspect {0} was arrested.", Functions.GetPersonaForPed(suspect).FullName));
                     }
-                    if (isLSPDFRPlusRunning)
-                    {
-                        LSPDFRPlusWrapperClass.CreateNewCourtCase(Functions.GetPersonaForPed(suspect), suspect.GetCrimesString(), 100, suspect.PrisonSentence);
-                    }
+                    suspect.CreateCourtCase(isLSPDFRPlusRunning);
                 }
                 else
                 {
@@ -1139,15 +1146,19 @@ namespace GangsOfSouthLS.Callouts
             }
             Suspectlist = newList;
 
+            if (isComputerPlusRunning && !merchantdead && Scenario.Merchant.Exists() && Scenario.Merchant.IsDead)
+            {
+                ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("The shopkeeper, {0}, was killed.", Functions.GetPersonaForPed(Scenario.Merchant).FullName));
+                merchantdead = true;
+            }
+
             if (Scenario.Driver.Exists() && Scenario.Driver.IsDead)
             {
                 DriverBlip.SafelyDelete();
-                Scenario.Driver.SafelyDismiss();
             }
             if (Scenario.Passenger.Exists() && Scenario.Passenger.IsDead)
             {
                 PassengerBlip.SafelyDelete();
-                Scenario.Passenger.SafelyDismiss();
             }
             if (Scenario.Merchant.Exists() && Scenario.Merchant.IsDead)
             {
@@ -1164,6 +1175,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     if (!Functions.IsPursuitStillRunning(Pursuit) && ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)) && ((!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Driver)))))
                     {
+                        CleanUp();
                         Game.LogTrivial("[GangsOfSouthLS] Pursuit ended, Ending callout regularly.");
                         endingregularly = true;
                         End();
@@ -1173,6 +1185,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     if ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)) && ((!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Driver))))
                     {
+                        CleanUp();
                         Game.LogTrivial("[GangsOfSouthLS] Everyone dead or arrested, Ending callout regularly.");
                         endingregularly = true;
                         End();
@@ -1200,7 +1213,7 @@ namespace GangsOfSouthLS.Callouts
             Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
             Scenario.Driver.AddCrimeToList("Resisting Arrest", 12);
             Scenario.Passenger.AddCrimeToList("Resisting Arrest", 12);
-            Scenario.Passenger.AddCrimeToList("Aggravated Assault on a police officer", 48);
+            Scenario.Passenger.AddCrimeToList("Aggravated Assault", 48);
             RacketState = ERacketState.WaitingToLeaveScene;
         }
 
@@ -1227,7 +1240,7 @@ namespace GangsOfSouthLS.Callouts
                         Game.LogTrivial("[GangsOfSouthLS] Making Passenger fight.");
                         MakePassengerBlip();
                         Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(80f);
-                        Scenario.Passenger.AddCrimeToList("Aggravated Assault on a police officer", 48);
+                        Scenario.Passenger.AddCrimeToList("Aggravated Assault", 48);
                         Scenario.Driver.AddCrimeToList("Resisting Arrest", 12);
                         Scenario.Passenger.AddCrimeToList("Resisting Arrest", 12);
                     }
@@ -1272,8 +1285,8 @@ namespace GangsOfSouthLS.Callouts
             }
             Functions.SetPursuitIsActiveForPlayer(Pursuit, true);
             firstloop = true;
-            RacketState = ERacketState.WaitingToLeaveScene;
             pursuitcreated = true;
+            RacketState = ERacketState.WaitingToLeaveScene;
         }
 
         internal void MakeStuffHappenWhenStartingAFight()
@@ -1285,7 +1298,6 @@ namespace GangsOfSouthLS.Callouts
             Game.SetRelationshipBetweenRelationshipGroups("COP", "RACKET_GANGSTER", Relationship.Hate);
             Scenario.Passenger.AddCrimeToList("Resisting Arrest", 12);
             Scenario.Driver.AddCrimeToList("Resisting Arrest", 12);
-            RacketState = ERacketState.WaitingToLeaveScene;
             if (!Scenario.Driver.SafelyIsDeadOrArrested())
             {
                 GameFiber.StartNew(delegate
@@ -1296,7 +1308,7 @@ namespace GangsOfSouthLS.Callouts
                         Scenario.Driver.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
                     }
                     Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                    Scenario.Driver.AddCrimeToList("Aggravated Assault on a police officer", 48);
+                    Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
                     while (!(RacketState == ERacketState.Ending))
                     {
                         if (Scenario.Driver.SafelyIsDeadOrArrested(true))
@@ -1327,6 +1339,7 @@ namespace GangsOfSouthLS.Callouts
                         GameFiber.Yield();
                     }
                 });
+                RacketState = ERacketState.WaitingToLeaveScene;
             }
             if (!Scenario.Passenger.SafelyIsDeadOrArrested())
             {
@@ -1338,7 +1351,7 @@ namespace GangsOfSouthLS.Callouts
                         Scenario.Passenger.Tasks.LeaveVehicle(LeaveVehicleFlags.LeaveDoorOpen).WaitForCompletion(3000);
                     }
                     Scenario.Passenger.Tasks.FightAgainstClosestHatedTarget(100f);
-                    Scenario.Passenger.AddCrimeToList("Aggravated Assault on a police officer", 48);
+                    Scenario.Passenger.AddCrimeToList("Aggravated Assault", 48);
                     while (!(RacketState == ERacketState.Ending))
                     {
                         if (Scenario.Passenger.SafelyIsDeadOrArrested(true))
@@ -1373,9 +1386,9 @@ namespace GangsOfSouthLS.Callouts
             firstloop = true;
         }
 
-        internal void MakeStuffHappenWhenArrestingTheDriver()
+        internal void MakeStuffHappenWhenArrestingDuringPullover()
         {
-            Game.LogTrivial("[GangsOfSouthLS] Driver is getting arrested.");
+            Game.LogTrivial("[GangsOfSouthLS] A suspect is getting arrested.");
             Functions.ForceEndCurrentPullover();
             if (UsefulFunctions.Decide(35))
             {
@@ -1383,7 +1396,7 @@ namespace GangsOfSouthLS.Callouts
             }
             else
             {
-                Game.LogTrivial("[GangsOfSouthLS] Driver was arrested safely.");
+                Game.LogTrivial("[GangsOfSouthLS] The suspect was arrested safely.");
                 RacketState = ERacketState.DriverSafelyArrested;
             }
         }
@@ -1645,6 +1658,19 @@ namespace GangsOfSouthLS.Callouts
         internal bool HasPlayerLeftScene()
         {
             if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 70f)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        internal bool AreTheGangstersGone()
+        {
+            if (!Scenario.GangsterCar.Exists() || !Scenario.Driver.Exists() || !Scenario.Passenger.Exists())
+            {
+                return true;
+            }
+            else if (Game.LocalPlayer.Character.DistanceTo(Scenario.GangsterCar) < 70f)
             {
                 return false;
             }

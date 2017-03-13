@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Rage;
 using System.ComponentModel;
+using GangsOfSouthLS.APIWrappers;
+using LSPD_First_Response.Mod.API;
 
 namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 {
@@ -32,24 +34,44 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         public string GetCrimesString()
         {
-            var listlen = CrimeSentenceDict.Count;
+            var CrimesList = CrimeSentenceDict.Keys.ToList();
+            var listlen = CrimesList.Count();
             if (listlen == 0)
             {
                 return "None";
             }
             else if (listlen == 1)
             {
-                return CrimeSentenceDict.First().Key;
+                return CrimesList[0];
             }
             else
             {
                 var returnString = "";
-                for (int c = 0; c == listlen - 2; c++)
+                for (int c = 0; c <= listlen - 2; c++)
                 {
-                    returnString += (CrimeSentenceDict.Keys.ToArray()[c] + ", ");
+                    returnString += (CrimesList[c] + ", ");
                 }
-                returnString += ("and " + CrimeSentenceDict.Keys.ToArray()[listlen - 1]);
+                returnString += ("and " + CrimesList[listlen - 1]);
                 return returnString;
+            }
+        }
+         public void CreateCourtCase(bool IsLSPDFRPlusRunning)
+        {
+            if (!IsLSPDFRPlusRunning || GetCrimesString() == "None")
+            {
+                return;
+            }
+            if (PrisonSentence == 0)
+            {
+                LSPDFRPlusWrapperClass.CreateNewCourtCase(Functions.GetPersonaForPed(this), GetCrimesString(), 0, 0);
+            }
+            else
+            {
+                foreach (var crime in CrimeSentenceDict)
+                {
+                    Game.LogTrivial("Crime: " + crime.Key + "Sentence: " + crime.Value);
+                }
+                LSPDFRPlusWrapperClass.CreateNewCourtCase(Functions.GetPersonaForPed(this), GetCrimesString(), 100, PrisonSentence);
             }
         }
     }

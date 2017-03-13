@@ -32,7 +32,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         {
             get
             {
-                return 1700 + (Line.Length * 15);
+                return 1900 + (Line.Length * 18);
             }
         }
 
@@ -108,10 +108,6 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
                 if (haltPreviousConversationPart)
                 {
                     breakConversation = true;
-                    while (!finishedTalking)
-                    {
-                        GameFiber.Yield();
-                    }
                 }
                 while (!finishedTalking)
                 {
@@ -124,7 +120,10 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
                     {
                         Game.DisplaySubtitle(string.Format("{0}{1}~w~: {2}", line.TalkerColor, line.Talker, line.Line), line.Duration);
                         GameFiber.Wait(line.Duration + 200);
-                        if (breakConversation) { break; }
+                        if (breakConversation)
+                        {
+                            break;
+                        }
                     }
                     else
                     {

@@ -54,19 +54,19 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         internal Vehicle BuyerCar { get; private set; }
         internal Vehicle DealerCar { get; private set; }
         internal Vehicle DealerVan { get; private set; }
-        internal List<Ped> DealerList { get; private set; }
-        internal List<Ped> BuyerList { get; private set; }
+        internal List<MyPed> DealerList { get; private set; }
+        internal List<MyPed> BuyerList { get; private set; }
         internal Vehicle CopCar1 { get; set; }
         internal Vehicle CopCar2 { get; set; }
         internal Dictionary<Vehicle, CopCarWayPoint> CopCarDict { get; set; }
         internal List<Vehicle> BadBoyCarList { get; private set; }
         internal string Name { get; private set; }
         internal Vector3 Position { get; private set; }
-        internal Ped Dealer1 { get; private set; }
-        internal Ped Dealer2 { get; private set; }
-        internal Ped Dealer3 { get; private set; }
-        internal Ped Buyer1 { get; private set; }
-        internal Ped Buyer2 { get; private set; }
+        internal MyPed Dealer1 { get; private set; }
+        internal MyPed Dealer2 { get; private set; }
+        internal MyPed Dealer3 { get; private set; }
+        internal MyPed Buyer1 { get; private set; }
+        internal MyPed Buyer2 { get; private set; }
         internal List<Ped> CopList1 { get; set; }
         internal List<Ped> CopList2 { get; set; }
         internal bool Dealer3WasSpawned { get; private set; }
@@ -166,17 +166,17 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             return veh;
         }
 
-        private List<Ped> MakeDealerList()
+        private List<MyPed> MakeDealerList()
         {
-            var list = new List<Ped> { };
+            var list = new List<MyPed> { };
             var dealerPedStringKeyValuePair = badBoyPedStringListDict.RandomElement();
             DealerGangNameString = dealerPedStringKeyValuePair.Value;
-            Dealer1 = dealer1SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+            Dealer1 = dealer1SpawnPos4.CreateMyPed(dealerPedStringKeyValuePair.Key.RandomElement());
             Dealer1.RandomizeVariation();
             Dealer1.IsPersistent = true;
             Dealer1.BlockPermanentEvents = true;
             list.Add(Dealer1);
-            Dealer2 = dealer2SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+            Dealer2 = dealer2SpawnPos4.CreateMyPed(dealerPedStringKeyValuePair.Key.RandomElement());
             Dealer2.RandomizeVariation();
             Dealer2.IsPersistent = true;
             Dealer2.BlockPermanentEvents = true;
@@ -184,7 +184,7 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             if (UsefulFunctions.Decide(50))
             {
                 Dealer3WasSpawned = true;
-                Dealer3 = dealer3SpawnPos4.CreatePed(dealerPedStringKeyValuePair.Key.RandomElement());
+                Dealer3 = dealer3SpawnPos4.CreateMyPed(dealerPedStringKeyValuePair.Key.RandomElement());
                 Dealer3.RandomizeVariation();
                 Dealer3.IsPersistent = true;
                 Dealer3.BlockPermanentEvents = true;
@@ -213,17 +213,17 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
             return list;
         }
 
-        private List<Ped> MakeBuyerList()
+        private List<MyPed> MakeBuyerList()
         {
-            var list = new List<Ped> { };
+            var list = new List<MyPed> { };
             var buyerPedStringKeyValuePair = badBoyPedStringListDict.RandomElement();
             BuyerGangNameString = buyerPedStringKeyValuePair.Value;
-            Buyer1 = buyer1SpawnPos4.CreatePed(buyerPedStringKeyValuePair.Key.RandomElement());
+            Buyer1 = buyer1SpawnPos4.CreateMyPed(buyerPedStringKeyValuePair.Key.RandomElement());
             Buyer1.RandomizeVariation();
             Buyer1.IsPersistent = true;
             Buyer1.BlockPermanentEvents = true;
             list.Add(Buyer1);
-            Buyer2 = buyer2SpawnPos4.CreatePed(buyerPedStringKeyValuePair.Key.RandomElement());
+            Buyer2 = buyer2SpawnPos4.CreateMyPed(buyerPedStringKeyValuePair.Key.RandomElement());
             Buyer2.RandomizeVariation();
             Buyer2.IsPersistent = true;
             Buyer2.BlockPermanentEvents = true;

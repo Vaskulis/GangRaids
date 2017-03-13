@@ -5,7 +5,7 @@ using Rage;
 using System;
 using System.Reflection;
 
-[assembly: Rage.Attributes.Plugin("GangsOfSouthLS", Description = "Vaskulis' GangsOfSouthLS", Author = "Vaskulis")]
+[assembly: Rage.Attributes.Plugin("GangsOfSouthLS", Description = "Vaskulis' Gangs Of South Los Santos", Author = "Vaskulis")]
 
 namespace GangsOfSouthLS
 {

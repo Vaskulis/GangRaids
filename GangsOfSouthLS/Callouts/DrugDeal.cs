@@ -1,9 +1,11 @@
-﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
+﻿using GangsOfSouthLS.APIWrappers;
+using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using GangsOfSouthLS.INIFile;
 using LSPD_First_Response.Mod.API;
 using LSPD_First_Response.Mod.Callouts;
 using Rage;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -30,7 +32,8 @@ namespace GangsOfSouthLS.Callouts
         private Blip copCar1Blip;
         private Blip copCar2Blip;
         private Dictionary<Ped, Blip> PedBlipDict;
-        private List<Ped> FighterList;
+        private List<MyPed> FighterList;
+        private List<MyPed> SuspectList;
 
         internal static Blip PlayerStartPointBlip;
         internal static Blip PlayerEndPointBlip;
@@ -45,6 +48,10 @@ namespace GangsOfSouthLS.Callouts
         private bool copCar1arrived = false;
         private bool copCar2arrived = false;
         private bool playerAddedToPursuit = false;
+
+        private bool isLSPDFRPlusRunning;
+        private bool isComputerPlusRunning;
+        private Guid callID;
 
         public override bool OnBeforeCalloutDisplayed()
         {
@@ -61,6 +68,12 @@ namespace GangsOfSouthLS.Callouts
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 70f);
             DealersAndBuyersHateEachOther = false;
             Buyer2IsFightingStraightAway = false;
+            isComputerPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("ComputerPlus", new Version("1.3.0.0"));
+            isLSPDFRPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("LSPDFR+", new Version("1.4.1.0"));
+            if (isComputerPlusRunning)
+            {
+                callID = ComputerPlusWrapperClass.CreateCallout("Drug Deal", "DRUG DEAL", Scenario.Position, ComputerPlus.EResponseType.Code_2, "Reports of a major drug deal between local gangs need to be acted upon. The plan is for three cars to converge on the suspects' location at the same time to try to make it impossible to flee. The suspects could be heavily armed.");
+            }
             return base.OnBeforeCalloutDisplayed();
         }
 
@@ -69,7 +82,8 @@ namespace GangsOfSouthLS.Callouts
             Scenario.Initialize();
             IsCurrentlyRunning = true;
             PedBlipDict = new Dictionary<Ped, Blip> { };
-            FighterList = new List<Ped> { };
+            FighterList = new List<MyPed> { };
+            SuspectList = new List<MyPed> { };
             DrugDealState = EDrugDealState.Accepted;
             SuspectsAreaBlip = new Blip(Scenario.Position, 50f);
             SuspectsAreaBlip.Alpha = 0.5f;
@@ -81,7 +95,20 @@ namespace GangsOfSouthLS.Callouts
                 Game.LogTrivial("[GangsOfSouthLS] Too close to callout area when accepting, aborting.");
                 return false;
             }
+            if (isComputerPlusRunning)
+            {
+                ComputerPlusWrapperClass.SetCalloutStatusToUnitResponding(callID);
+            }
             return base.OnCalloutAccepted();
+        }
+
+        public override void OnCalloutNotAccepted()
+        {
+            if (isComputerPlusRunning)
+            {
+                ComputerPlusWrapperClass.AssignCallToAIUnit(callID);
+            }
+            base.OnCalloutNotAccepted();
         }
 
         public override void Process()
@@ -95,6 +122,25 @@ namespace GangsOfSouthLS.Callouts
                     SuspectsAreaBlip.DisableRoute();
                     Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangsOfSouthLS_PROCEED_WITH_CAUTION");
                     DrugDealState = EDrugDealState.InPreparation;
+                    foreach (var suspect in Scenario.DealerList)
+                    {
+                        SuspectList.Add(suspect);
+                        suspect.AddCrimeToList("Conspiracy to distribute drugs", 120);
+                    }
+                    foreach (var suspect in Scenario.BuyerList)
+                    {
+                        SuspectList.Add(suspect);
+                        suspect.AddCrimeToList("Conspiracy to distribute drugs", 120);
+                    }
+                    if (isComputerPlusRunning)
+                    {
+                        ComputerPlusWrapperClass.SetCalloutStatusToAtScene(callID);
+                        ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Officer arrived at the scene and starting preparation of the raid. Suspect vehicles identified.");
+                        foreach (var veh in Scenario.BadBoyCarList)
+                        {
+                            ComputerPlusWrapperClass.AddVehicleToCallout(callID, veh);
+                        }
+                    }
                 }
             }
 
@@ -134,6 +180,10 @@ namespace GangsOfSouthLS.Callouts
                 }
                 if (IsPlayerTooCloseToSuspects())
                 {
+                    if (isComputerPlusRunning)
+                    {
+                        ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Officer was seen by the suspects. Starting raid.");
+                    }
                     Game.DisplayHelp("The ~r~suspects ~w~saw you, it's now or never!");
                     DrugDealState = EDrugDealState.Arrived;
                 }
@@ -145,6 +195,10 @@ namespace GangsOfSouthLS.Callouts
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Player died, ending callout.");
                     End();
+                }
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Starting raid. Officer is approaching from the " + PlayerDirection.ToLower() + ".");
                 }
                 PlayerEndPointBlip = new Blip(PlayerEndPosition);
                 PlayerEndPointBlip.Color = System.Drawing.Color.Purple;
@@ -430,6 +484,10 @@ namespace GangsOfSouthLS.Callouts
 
             if (!endingregularly)
             {
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.CancelCallout(callID);
+                }
                 Game.LogTrivial("[GangsOfSouthLS] NOT ending callout regularly.");
                 if (!(Scenario == null))
                 {
@@ -464,6 +522,13 @@ namespace GangsOfSouthLS.Callouts
                             Cop.SafelyDismiss();
                         }
                     }
+                }
+            }
+            else
+            {
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.ConcludeCallout(callID);
                 }
             }
             base.End();
@@ -749,12 +814,12 @@ namespace GangsOfSouthLS.Callouts
 
         private void CleanUp()
         {
-            var newDict = new Dictionary<Ped, Blip> { };
+            var newPedBlipDict = new Dictionary<Ped, Blip> { };
             foreach (var pedblip in PedBlipDict)
             {
                 if (pedblip.Key.Exists() && !pedblip.Key.IsDead)
                 {
-                    newDict.Add(pedblip.Key, pedblip.Value);
+                    newPedBlipDict.Add(pedblip.Key, pedblip.Value);
                 }
                 else
                 {
@@ -763,34 +828,73 @@ namespace GangsOfSouthLS.Callouts
                     pedblip.Key.SafelyDismiss();
                 }
             }
-            PedBlipDict = newDict;
-            var newList = new List<Ped> { };
+            PedBlipDict = newPedBlipDict;
+
+            var newFighterList = new List<MyPed> { };
             foreach (var fighter in FighterList)
             {
                 if (fighter.Exists() && !fighter.IsDead && !Functions.IsPedArrested(fighter))
                 {
-                    newList.Add(fighter);
+                    newFighterList.Add(fighter);
                 }
             }
-            FighterList = newList;
+            FighterList = newFighterList;
+
+            var newSuspectList = new List<MyPed> { };
+            foreach (var suspect in SuspectList)
+            {
+                if (!suspect.Exists())
+                {
+                    continue;
+                }
+                else if (suspect.IsDead)
+                {
+                    if (isComputerPlusRunning)
+                    {
+                        ComputerPlusWrapperClass.AddPedToCallout(callID, suspect);
+                        ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("Suspect {0} was killed.", Functions.GetPersonaForPed(suspect).FullName));
+                    }
+                }
+                else if (Functions.IsPedArrested(suspect))
+                {
+                    if (isComputerPlusRunning)
+                    {
+                        ComputerPlusWrapperClass.AddPedToCallout(callID, suspect);
+                        ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("Suspect {0} was arrested.", Functions.GetPersonaForPed(suspect).FullName));
+                    }
+                    suspect.CreateCourtCase(isLSPDFRPlusRunning);
+                }
+                else
+                {
+                    newSuspectList.Add(suspect);
+                }
+            }
+            SuspectList = newSuspectList;
         }
 
-        private void MakeFight(Ped ped)
+        private void MakeFight(MyPed ped)
         {
             ped.Tasks.FightAgainstClosestHatedTarget(100f);
+            ped.AddCrimeToList("Aggravated Assault", 36);
+            ped.AddCrimeToList("Resisting Arrest", 12);
             FighterList.Add(ped);
         }
 
-        private void AddToPursuitAndDeleteBlip(Ped ped)
+        private void AddToPursuitAndDeleteBlip(MyPed ped)
         {
             if (PedBlipDict.ContainsKey(ped))
             {
                 PedBlipDict[ped].SafelyDelete();
             }
             Functions.AddPedToPursuit(Pursuit, ped);
+            ped.AddCrimeToList("Resisting Arrest", 24);
             if (!playerAddedToPursuit)
             {
                 playerAddedToPursuit = true;
+                if (isComputerPlusRunning)
+                {
+                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "Suspects are trying to flee, officer in pursuit");
+                }
                 Game.LogTrivial("[GangsOfSouthLS] Setting Pursuit as active for player");
                 Functions.SetPursuitIsActiveForPlayer(Pursuit, true);
                 if (INIReader.RequestAirSupport)

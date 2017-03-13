@@ -9,7 +9,7 @@ using Rage;
 
 namespace GangsOfSouthLS.APIWrappers
 {
-    class LSPDFRPlusWrapperClass
+    static class LSPDFRPlusWrapperClass
     {
         public static void AddQuestionToTrafficStop(Ped Suspect, string Question, List<string> Answers)
         {
