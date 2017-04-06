@@ -36,7 +36,7 @@ namespace GangsOfSouthLS.Callouts
         private bool endDeletingStockMerchant = false;
         private bool gangstersSeePlayer = false;
         private bool glueCar = false;
-        private bool merchantdead = false;
+        private bool merchantdeathnoted = false;
         private Conversation RacketConversation;
         private bool isLSPDFRPlusRunning;
         private bool isComputerPlusRunning;
@@ -70,7 +70,7 @@ namespace GangsOfSouthLS.Callouts
             isLSPDFRPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("LSPDFR+", new Version("1.4.1.0"));
             if (isComputerPlusRunning)
             {
-                callID = ComputerPlusWrapperClass.CreateCallout("Protection Racketeering", "PROTECTION RACKETEERING", Scenario.Position, ComputerPlus.EResponseType.Code_2, "The owner of the shop reported a regular collection of protection money by one of the local gangs. To collect evidence, the owner agreed to talk to the racketeers while wearing a hidden microphone.");
+                callID = ComputerPlusWrapperClass.CreateCallout("Protection Racketeering", "PROTECTION RACKETEERING", Scenario.Position, 0, "The owner of the shop reported a regular collection of protection money by one of the local gangs. To collect evidence, the owner agreed to talk to the racketeers while wearing a hidden microphone.");
             }
             return base.OnBeforeCalloutDisplayed();
         }
@@ -185,11 +185,6 @@ namespace GangsOfSouthLS.Callouts
                 DoIfStateInPullover();
             }
 
-            if (RacketState == ERacketState.ArrestingBoth)
-            {
-                DoIfStateArrestingBoth();
-            }
-
             if (RacketState == ERacketState.DriverSafelyArrested)
             {
                 DoIfStateDriverSafelyArrested();
@@ -228,6 +223,12 @@ namespace GangsOfSouthLS.Callouts
                 {
                     ComputerPlusWrapperClass.CancelCallout(callID);
                 }
+                if (!(Scenario == null))
+                {
+                    Scenario.Passenger.SafelyDismiss();
+                    Scenario.Driver.SafelyDismiss();
+                    Scenario.Merchant.SafelyDismiss();
+                }
             }
             else
             {
@@ -250,12 +251,6 @@ namespace GangsOfSouthLS.Callouts
             {
                 Scenario.GangsterCar.SafelyDismiss();
                 Scenario.Merchant.SafelyDelete();
-            }
-            if (!(Scenario == null) && !endingregularly)
-            {
-                Scenario.Passenger.SafelyDismiss();
-                Scenario.Driver.SafelyDismiss();
-                Scenario.Merchant.SafelyDismiss();
             }
             base.End();
         }
@@ -673,7 +668,7 @@ namespace GangsOfSouthLS.Callouts
         internal void DoIfStateRacketeerLeavingShopNormally()
         {
             CleanUp();
-            EndVisibleCheck();
+            CheckAndReactIfVisibleInShop();
             if (firstloop)
             {
                 firstloop = false;
@@ -693,6 +688,7 @@ namespace GangsOfSouthLS.Callouts
                             Scenario.Driver.Tasks.CruiseWithVehicle(12f, VehicleDrivingFlags.Normal);
                             MakeCarBlip();
                             RacketConversation.PlayConversationPartOfState(ConversationState.InformingOfDeparture);
+                            EndVisibleCheck();
                             RacketState = ERacketState.WaitingForPullover;
                         }
                         else
@@ -718,16 +714,55 @@ namespace GangsOfSouthLS.Callouts
             {
                 firstloop = false;
                 EndVisibleCheck();
-                MakeDriverBlip();
                 MakePassengerBlip();
+                MakeDriverBlip();
                 Game.SetRelationshipBetweenRelationshipGroups("RACKET_GANGSTER", "RACKET_MERCHANT", Relationship.Hate);
                 Game.SetRelationshipBetweenRelationshipGroups("RACKET_MERCHANT", "RACKET_GANGSTER", Relationship.Hate);
+                glueCar = true;
                 GameFiber.StartNew(delegate
                 {
-                    Scenario.Passenger.Tasks.FightAgainst(Scenario.Merchant);
-                    GameFiber.StartNew(delegate
+                    var pos = Scenario.GangsterCar.Position;
+                    while (glueCar)
                     {
-                        GameFiber.Wait(10000);
+                        GameFiber.Yield();
+                        Scenario.GangsterCar.Position = pos;
+                    }
+                });
+                GameFiber.StartNew(delegate
+                {
+                    if (!Scenario.Passenger.SafelyIsDeadOrArrested())
+                    {
+                        Scenario.Passenger.Tasks.FightAgainst(Scenario.Merchant);
+                        RacketConversation.PlayConversationPartOfState(ConversationState.Attacking);
+                        if (!Scenario.Driver.SafelyIsDeadOrArrested())
+                        {
+                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, false);
+                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanDoDrivebys, true);
+                            Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
+                            Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
+                        }
+                        while (!RacketConversation.IsFinished)
+                        {
+                            GameFiber.Yield();
+                        }
+                        if (givenbat)
+                        {
+                            Game.DisplaySubtitle("<i>~o~*thudding noises and screaming*</i>");
+                        }
+                        else
+                        {
+                            Game.DisplaySubtitle("<i>~o~*gunshots and screaming*</i>");
+                        }
+                        var merchanttimerrunout = false;
+                        GameFiber.StartNew(delegate
+                        {
+                            GameFiber.Wait(10000);
+                            merchanttimerrunout = true;
+                        });
+                        while(!merchanttimerrunout && !Scenario.Merchant.IsDead)
+                        {
+                            GameFiber.Yield();
+                        }
                         if (Scenario.Merchant.IsDead)
                         {
                             Scenario.Passenger.AddCrimeToList("Second Degree Murder", 144);
@@ -736,45 +771,15 @@ namespace GangsOfSouthLS.Callouts
                         {
                             Scenario.Passenger.AddCrimeToList("Aggravated Assault", 36);
                         }
-                    });
-                    while (!RacketConversation.IsFinished)
-                    {
-                        GameFiber.Yield();
-                    }
-                    RacketConversation.PlayConversationPartOfState(ConversationState.Attacking);
-                    MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, false);
-                    MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanDoDrivebys, true);
-                    Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                    glueCar = true;
-                    GameFiber.StartNew(delegate
-                    {
-                        Vector3 pos;
-                        while (glueCar)
+                        if (givenbat)
                         {
-                            pos = Scenario.GangsterCar.Position;
-                            GameFiber.Yield();
-                            Scenario.GangsterCar.Position = pos;
+                            Game.LogTrivial("[GangsOfSouthLS] Giving the racketeer back a gun.");
+                            Scenario.Passenger.Inventory.GiveNewWeapon(Scenario.GunList.RandomElement(), 999, false);
                         }
-                    });
-                    Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                    Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
-                    while (!RacketConversation.IsFinished)
-                    {
-                        GameFiber.Yield();
-                    }
-                    if (givenbat)
-                    {
-                        Game.DisplaySubtitle("<i>~o~*thudding noises and screaming*</i>");
-                    }
-                    else
-                    {
-                        Game.DisplaySubtitle("<i>~o~*gunshots and screaming*</i>");
-                    }
-                    GameFiber.Wait(5000);
-                    if (givenbat)
-                    {
-                        Game.LogTrivial("[GangsOfSouthLS] Giving the racketeer back a gun.");
-                        Scenario.Passenger.Inventory.GiveNewWeapon(Scenario.GunList.RandomElement(), 999, false);
+                        if (!Scenario.Driver.SafelyIsDeadOrArrested())
+                        {
+                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
+                        }
                     }
                     if (UsefulFunctions.Decide(50))
                     {
@@ -783,46 +788,166 @@ namespace GangsOfSouthLS.Callouts
                         if (!(RacketState == ERacketState.Ending))
                         {
                             MakeStuffHappenWhenStartingAFight();
-                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
                         }
                     }
                     else if (UsefulFunctions.Decide(50))
                     {
                         glueCar = false;
-                        Game.LogTrivial("[GangsOfSouthLS] Starting the pursuit without letting the Passenger try to enter the car.");
+                        Game.LogTrivial("[GangsOfSouthLS] Starting the pursuit immediately.");
                         if (!(RacketState == ERacketState.Ending))
                         {
                             MakeStuffHappenWhenCreatingSelfmadePursuit();
-                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
                         }
                     }
                     else
                     {
-                        Game.LogTrivial("[GangsOfSouthLS] Making the racketeer try to enter the car before starting the pursuit");
-                        Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 3f);
-                        for (int i = 0; i <= 25; i++)
+                        if (!Scenario.Passenger.SafelyIsDeadOrArrested())
                         {
-                            Game.LogTrivial(string.Format("[GangsOfSouthLS] Waited {0} ms for Passenger to enter the car", i * 500));
-                            GameFiber.Wait(500);
-                            if (Scenario.Passenger.Exists() && (Scenario.Passenger.IsInAnyVehicle(false) || Scenario.Passenger.IsDead))
+                            Game.LogTrivial("[GangsOfSouthLS] Making the racketeer try to enter the car before starting the pursuit");
+                            Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 3f);
+                            for (int i = 0; i <= 25; i++)
                             {
-                                break;
+                                Game.LogTrivial(string.Format("[GangsOfSouthLS] Waited {0} ms for Passenger to enter the car", i * 500));
+                                GameFiber.Wait(500);
+                                if (Scenario.Passenger.Exists() && (Scenario.Passenger.IsInAnyVehicle(false) || Scenario.Passenger.IsDead))
+                                {
+                                    break;
+                                }
                             }
                         }
                         if (!(RacketState == ERacketState.Ending))
                         {
-                            Scenario.Driver.Tasks.Clear();
+                            if (!Scenario.Driver.SafelyIsDeadOrArrested())
+                            {
+                                Scenario.Driver.Tasks.Clear();
+                            }
                             glueCar = false;
-                            MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
                             MakeStuffHappenWhenCreatingSelfmadePursuit();
                         }
                     }
+                    if (isComputerPlusRunning)
+                    {
+                        ComputerPlusWrapperClass.AddUpdateToCallout(callID, "The racketeers are attacking the shopkeeper after finding out about the officer listening.");
+                    }
                 });
-                if (isComputerPlusRunning)
-                {
-                    ComputerPlusWrapperClass.AddUpdateToCallout(callID, "The racketeers are attacking the shopkeeper after finding out about the officer listening.");
-                }
             }
+            //    CleanUp();
+            //    if (firstloop)
+            //    {
+            //        firstloop = false;
+            //        EndVisibleCheck();
+            //        MakeDriverBlip();
+            //        MakePassengerBlip();
+            //        Game.SetRelationshipBetweenRelationshipGroups("RACKET_GANGSTER", "RACKET_MERCHANT", Relationship.Hate);
+            //        Game.SetRelationshipBetweenRelationshipGroups("RACKET_MERCHANT", "RACKET_GANGSTER", Relationship.Hate);
+            //        GameFiber.StartNew(delegate
+            //        {
+            //            if (!Scenario.Passenger.SafelyIsDeadOrArrested())
+            //            {
+            //                Scenario.Passenger.Tasks.FightAgainst(Scenario.Merchant);
+            //                RacketConversation.PlayConversationPartOfState(ConversationState.Attacking);
+            //                GameFiber.StartNew(delegate
+            //                {
+            //                    while (!RacketConversation.IsFinished)
+            //                    {
+            //                        GameFiber.Yield();
+            //                    }
+            //                    if (givenbat)
+            //                    {
+            //                        Game.DisplaySubtitle("<i>~o~*thudding noises and screaming*</i>");
+            //                    }
+            //                    else
+            //                    {
+            //                        Game.DisplaySubtitle("<i>~o~*gunshots and screaming*</i>");
+            //                    }
+            //                });
+            //                GameFiber.StartNew(delegate
+            //                {
+            //                    glueCar = true;
+            //                    GameFiber.StartNew(delegate
+            //                    {
+            //                        Vector3 pos;
+            //                        while (glueCar)
+            //                        {
+            //                            pos = Scenario.GangsterCar.Position;
+            //                            GameFiber.Yield();
+            //                            Scenario.GangsterCar.Position = pos;
+            //                        }
+            //                    });
+            //                    GameFiber.Wait(10000);
+            //                    if (Scenario.Merchant.IsDead)
+            //                    {
+            //                        Scenario.Passenger.AddCrimeToList("Second Degree Murder", 144);
+            //                    }
+            //                    else
+            //                    {
+            //                        Scenario.Passenger.AddCrimeToList("Aggravated Assault", 36);
+            //                    }
+            //                    if (!Scenario.Driver.SafelyIsDeadOrArrested())
+            //                    {
+            //                        Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
+            //                        Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
+            //                    }
+            //                    if (givenbat)
+            //                    {
+            //                        Game.LogTrivial("[GangsOfSouthLS] Giving the racketeer back a gun.");
+            //                        Scenario.Passenger.Inventory.GiveNewWeapon(Scenario.GunList.RandomElement(), 999, false);
+            //                    }
+            //                });
+            //            }
+            //            if (UsefulFunctions.Decide(40))
+            //            {
+            //                glueCar = false;
+            //                Game.LogTrivial("[GangsOfSouthLS] Starting a fight.");
+            //                if (!(RacketState == ERacketState.Ending))
+            //                {
+            //                    MakeStuffHappenWhenStartingAFight();
+            //                    MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
+            //                }
+            //            }
+            //            else if (UsefulFunctions.Decide(50))
+            //            {
+            //                glueCar = false;
+            //                Game.LogTrivial("[GangsOfSouthLS] Starting the pursuit without letting the Passenger try to enter the car.");
+            //                if (!(RacketState == ERacketState.Ending))
+            //                {
+            //                    MakeStuffHappenWhenCreatingSelfmadePursuit();
+            //                    MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
+            //                }
+            //            }
+            //            else
+            //            {
+            //                if (!Scenario.Passenger.SafelyIsDeadOrArrested())
+            //                {
+            //                    Game.LogTrivial("[GangsOfSouthLS] Making the racketeer try to enter the car before starting the pursuit");
+            //                    Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 3f);
+            //                    for (int i = 0; i <= 25; i++)
+            //                    {
+            //                        Game.LogTrivial(string.Format("[GangsOfSouthLS] Waited {0} ms for Passenger to enter the car", i * 500));
+            //                        GameFiber.Wait(500);
+            //                        if (Scenario.Passenger.Exists() && (Scenario.Passenger.IsInAnyVehicle(false) || Scenario.Passenger.IsDead))
+            //                        {
+            //                            break;
+            //                        }
+            //                    }
+            //                }
+            //                if (!(RacketState == ERacketState.Ending))
+            //                {
+            //                    if (!Scenario.Driver.SafelyIsDeadOrArrested())
+            //                    {
+            //                        Scenario.Driver.Tasks.Clear();
+            //                    }
+            //                    glueCar = false;
+            //                    MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
+            //                    MakeStuffHappenWhenCreatingSelfmadePursuit();
+            //                }
+            //            }
+            //        });
+            //        if (isComputerPlusRunning)
+            //        {
+            //            ComputerPlusWrapperClass.AddUpdateToCallout(callID, "The racketeers are attacking the shopkeeper after finding out about the officer listening.");
+            //        }
+            //    }
         }
 
         internal void DoIfStateFleeingAfterConversation()
@@ -846,8 +971,11 @@ namespace GangsOfSouthLS.Callouts
                     MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, false);
                     if (!(RacketState == ERacketState.Ending))
                     {
-                        Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
-                        Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
+                        if (!Scenario.Driver.SafelyIsDeadOrArrested())
+                        {
+                            Scenario.Driver.Tasks.FightAgainstClosestHatedTarget(100f);
+                            Scenario.Driver.AddCrimeToList("Aggravated Assault", 48);
+                        }
                         glueCar = true;
                         GameFiber.StartNew(delegate
                         {
@@ -860,20 +988,26 @@ namespace GangsOfSouthLS.Callouts
                             }
                         });
                     }
-                    Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 3f);
-                    for (int i = 0; i <= 25; i++)
+                    if (!Scenario.Passenger.SafelyIsDeadOrArrested())
                     {
-                        Game.LogTrivial(string.Format("[GangsOfSouthLS] Waited {0} ms for Passenger to enter the car", i * 500));
-                        GameFiber.Wait(500);
-                        if (Scenario.Passenger.Exists() && (Scenario.Passenger.IsInAnyVehicle(false) || Scenario.Passenger.IsDead))
+                        Scenario.Passenger.Tasks.EnterVehicle(Scenario.GangsterCar, 0, 3f);
+                        for (int i = 0; i <= 25; i++)
                         {
-                            break;
+                            Game.LogTrivial(string.Format("[GangsOfSouthLS] Waited {0} ms for Passenger to enter the car", i * 500));
+                            GameFiber.Wait(500);
+                            if (Scenario.Passenger.Exists() && (Scenario.Passenger.IsInAnyVehicle(false) || Scenario.Passenger.IsDead))
+                            {
+                                break;
+                            }
                         }
                     }
                     if (!(RacketState == ERacketState.Ending))
                     {
                         glueCar = false;
-                        Scenario.Driver.Tasks.Clear();
+                        if (!Scenario.Driver.SafelyIsDeadOrArrested())
+                        {
+                            Scenario.Driver.Tasks.Clear();
+                        }
                         MyNatives.SetPedCombatAttributes(Scenario.Driver, MyNatives.CombatAttributesFlag.CanLeaveVehicle, true);
                         MakeStuffHappenWhenCreatingSelfmadePursuit();
                     }
@@ -939,7 +1073,7 @@ namespace GangsOfSouthLS.Callouts
                 {
                     firstloop = false;
                     Game.LogTrivial("[GangsOfSouthLS] Allowing the Player to arrest both.");
-                    RacketState = ERacketState.ArrestingBoth;
+                    RacketState = ERacketState.WaitingToLeaveScene;
                 }
             }
             if (Functions.IsPedGettingArrested(Scenario.Driver) || Functions.IsPedGettingArrested(Scenario.Passenger))
@@ -1000,15 +1134,6 @@ namespace GangsOfSouthLS.Callouts
             {
                 Game.LogTrivial("[GangsOfSouthLS] Passenger is not fleeing.");
                 RacketState = ERacketState.WaitingToLeaveScene;
-            }
-        }
-
-        internal void DoIfStateArrestingBoth()
-        {
-            CleanUp();
-            if (!(Functions.GetActivePursuit() == null))
-            {
-                MakeStuffHappenWhenAutomaticPursuitIsCreated();
             }
         }
 
@@ -1146,10 +1271,10 @@ namespace GangsOfSouthLS.Callouts
             }
             Suspectlist = newList;
 
-            if (isComputerPlusRunning && !merchantdead && Scenario.Merchant.Exists() && Scenario.Merchant.IsDead)
+            if (isComputerPlusRunning && !merchantdeathnoted && Scenario.Merchant.Exists() && Scenario.Merchant.IsDead)
             {
                 ComputerPlusWrapperClass.AddUpdateToCallout(callID, string.Format("The shopkeeper, {0}, was killed.", Functions.GetPersonaForPed(Scenario.Merchant).FullName));
-                merchantdead = true;
+                merchantdeathnoted = true;
             }
 
             if (Scenario.Driver.Exists() && Scenario.Driver.IsDead)
@@ -1173,7 +1298,7 @@ namespace GangsOfSouthLS.Callouts
             {
                 if (pursuitcreated)
                 {
-                    if (!Functions.IsPursuitStillRunning(Pursuit) && ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)) && ((!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Driver)))))
+                    if (!Functions.IsPursuitStillRunning(Pursuit) && ((!Scenario.Passenger.Exists() || Scenario.Passenger.SafelyIsDeadOrArrested()) && ((!Scenario.Driver.Exists() || Scenario.Driver.SafelyIsDeadOrArrested()))))
                     {
                         CleanUp();
                         Game.LogTrivial("[GangsOfSouthLS] Pursuit ended, Ending callout regularly.");
@@ -1183,7 +1308,7 @@ namespace GangsOfSouthLS.Callouts
                 }
                 else
                 {
-                    if ((!Scenario.Passenger.Exists() || Scenario.Passenger.IsDead || Functions.IsPedArrested(Scenario.Passenger)) && ((!Scenario.Driver.Exists() || Scenario.Driver.IsDead || Functions.IsPedArrested(Scenario.Driver))))
+                    if ((!Scenario.Passenger.Exists() || Scenario.Passenger.SafelyIsDeadOrArrested()) && ((!Scenario.Driver.Exists() || Scenario.Driver.SafelyIsDeadOrArrested())))
                     {
                         CleanUp();
                         Game.LogTrivial("[GangsOfSouthLS] Everyone dead or arrested, Ending callout regularly.");
@@ -1473,7 +1598,7 @@ namespace GangsOfSouthLS.Callouts
         {
             Game.LogTrivial("[GangsOfSouthLS] Starting check if gangsters see player.");
             var gangsterList = new List<Ped> { Scenario.Driver, Scenario.Passenger };
-            //check every tick if player is shooting or one of the gangsters is dead
+            //check every tick if player is shooting or one of the gangsters is dead or arrested
             GameFiber.StartNew(delegate
             {
                 while (Functions.IsCalloutRunning() && !endVisibleCheck)
@@ -1485,6 +1610,13 @@ namespace GangsOfSouthLS.Callouts
                             if (gangster.IsDead)
                             {
                                 Game.LogTrivial("[GangsOfSouthLS] One of the gangsters died.");
+                                gangstersSeePlayer = true;
+                                endVisibleCheck = true;
+                                break;
+                            }
+                            if (Functions.IsPedArrested(gangster))
+                            {
+                                Game.LogTrivial("[GangsOfSouthLS] One of the gangsters was arrested.");
                                 gangstersSeePlayer = true;
                                 endVisibleCheck = true;
                                 break;

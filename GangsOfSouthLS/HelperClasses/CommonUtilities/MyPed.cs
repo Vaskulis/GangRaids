@@ -71,7 +71,8 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
                 {
                     Game.LogTrivial("Crime: " + crime.Key + "Sentence: " + crime.Value);
                 }
-                LSPDFRPlusWrapperClass.CreateNewCourtCase(Functions.GetPersonaForPed(this), GetCrimesString(), 100, PrisonSentence);
+                var RandomPrisonSentence = ( (UsefulFunctions.rng.Next(90, 110) / 100.0) * PrisonSentence ) ;
+                LSPDFRPlusWrapperClass.CreateNewCourtCase(Functions.GetPersonaForPed(this), GetCrimesString(), 100, (int)RandomPrisonSentence);
             }
         }
     }

@@ -72,7 +72,7 @@ namespace GangsOfSouthLS.Callouts
             isLSPDFRPlusRunning = DependencyPluginCheck.IsLSPDFRPluginRunning("LSPDFR+", new Version("1.4.1.0"));
             if (isComputerPlusRunning)
             {
-                callID = ComputerPlusWrapperClass.CreateCallout("Drug Deal", "DRUG DEAL", Scenario.Position, ComputerPlus.EResponseType.Code_2, "Reports of a major drug deal between local gangs need to be acted upon. The plan is for three cars to converge on the suspects' location at the same time to try to make it impossible to flee. The suspects could be heavily armed.");
+                callID = ComputerPlusWrapperClass.CreateCallout("Drug Deal", "DRUG DEAL", Scenario.Position, 0, "Reports of a major drug deal between local gangs need to be acted upon. The plan is for three cars to converge on the suspects' location at the same time to try to make it impossible to flee. The suspects could be heavily armed.");
             }
             return base.OnBeforeCalloutDisplayed();
         }

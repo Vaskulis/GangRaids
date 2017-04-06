@@ -11,9 +11,9 @@ namespace GangsOfSouthLS.APIWrappers
 {
     static class ComputerPlusWrapperClass
     {
-        public static Guid CreateCallout(string CallName, string ShortName, Vector3 Location, EResponseType ResponseType, string Description = "", ECallStatus CallStatus = ECallStatus.Created, List<Ped> CallPeds = null, List<Vehicle> CallVehicles = null)
+        public static Guid CreateCallout(string CallName, string ShortName, Vector3 Location, int ResponseType, string Description = "", int CallStatus = 1, List<Ped> CallPeds = null, List<Vehicle> CallVehicles = null)
         {
-            return Functions.CreateCallout(new CalloutData(CallName, ShortName, Location, ResponseType, Description, CallStatus, CallPeds, CallVehicles));
+            return Functions.CreateCallout(new CalloutData(CallName, ShortName, Location, (EResponseType)ResponseType, Description, (ECallStatus)CallStatus, CallPeds, CallVehicles));
         }
 
         public static void UpdateCalloutStatus(Guid ID, int Status)
