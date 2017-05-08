@@ -15,7 +15,7 @@ namespace GangsOfSouthLS.Callouts
     internal class DrugDeal : Callout
     {
         internal static Scenario Scenario;
-        internal static ScenarioScheme ScenarioScheme;
+        internal static ScenarioTemplate ScenarioTemplate;
         internal static Vector3 PlayerStartPosition;
         internal static Vector3 PlayerEndPosition;
         internal static string PlayerDirection;
@@ -55,13 +55,13 @@ namespace GangsOfSouthLS.Callouts
 
         public override bool OnBeforeCalloutDisplayed()
         {
-            var scenarioFound = ScenarioScheme.ChooseScenario(out ScenarioScheme);
+            var scenarioFound = ScenarioTemplate.ChooseScenario(out ScenarioTemplate);
             if (!scenarioFound)
             {
                 Game.LogTrivial("[GangsOfSouthLS] Could not find scenario in range.");
                 return false;
             }
-            Scenario = new Scenario(ScenarioScheme);
+            Scenario = new Scenario(ScenarioTemplate);
             CalloutMessage = "Drug deal in progress";
             CalloutPosition = Scenario.Position;
             Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_DRUGDEAL IN_OR_ON_POSITION UNITS_RESPOND_CODE_02_02", INIReader.UnitName), Scenario.Position);
@@ -154,14 +154,7 @@ namespace GangsOfSouthLS.Callouts
                 if (Game.LocalPlayer.Character.Position.DistanceTo(PlayerStartPosition) > 7f)
                 {
                     PlayerIsInPosition = false;
-                    if (INIReader.MenuModifierKey != Keys.None)
-                    {
-                        Game.DisplayHelp(string.Format("Get into ~p~position ~w~or press ~b~{0} + {1} ~w~to open the menu. Be careful not to get to close to the ~y~suspects~w~!", INIReader.MenuModifierKey.ToString(), INIReader.MenuKey.ToString()));
-                    }
-                    else
-                    {
-                        Game.DisplayHelp(string.Format("Get into ~p~position ~w~or press ~b~{0} ~w~to open the menu. Be careful not to get to close to the ~y~suspects~w~!", INIReader.MenuKey.ToString()));
-                    }
+                    Game.DisplayHelp(string.Format("Get into ~p~position ~w~or press ~b~{0} ~w~to open the menu. Be careful not to get to close to the ~y~suspects~w~!", INIReader.MenuKeyString));
                 }
                 else
                 {
@@ -273,13 +266,13 @@ namespace GangsOfSouthLS.Callouts
                 {
                     PlayerStartPointBlip.Delete();
                 }
-                CreateSuspectBlip(Scenario.Buyer1, Buyer1Blip);
-                CreateSuspectBlip(Scenario.Buyer2, Buyer2Blip);
-                CreateSuspectBlip(Scenario.Dealer1, Dealer1Blip);
-                CreateSuspectBlip(Scenario.Dealer2, Dealer2Blip);
+                Buyer1Blip = CreateSuspectBlip(Scenario.Buyer1);
+                Buyer2Blip = CreateSuspectBlip(Scenario.Buyer2);
+                Dealer1Blip = CreateSuspectBlip(Scenario.Dealer1);
+                Dealer2Blip = CreateSuspectBlip(Scenario.Dealer2);
                 if (Scenario.Dealer3WasSpawned)
                 {
-                    CreateSuspectBlip(Scenario.Dealer3, Dealer3Blip);
+                    Dealer3Blip = CreateSuspectBlip(Scenario.Dealer3);
                 }
 
                 Pursuit = Functions.CreatePursuit();
@@ -961,13 +954,14 @@ namespace GangsOfSouthLS.Callouts
             return false;
         }
 
-        private void CreateSuspectBlip(Ped ped, Blip blip)
+        private Blip CreateSuspectBlip(Ped ped)
         {
-            blip = new Blip(ped);
+            var blip = new Blip(ped);
             blip.Color = System.Drawing.Color.FromArgb(224, 50, 50);
             blip.Scale = 0.75f;
             blip.Order = 0;
             PedBlipDict.Add(ped, blip);
+            return blip;
         }
 
         private bool HasPlayerLeftScene()

@@ -36,5 +36,10 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
         {
             return NativeFunction.Natives.HasEntityClearLosToEntityInFront<bool>(thisEntity, entity);
         }
+
+        internal static void ClearInventory(this Ped ped)
+        {
+            NativeFunction.Natives.RemoveAllPedWeapons(ped, true);
+        }
     }
 }

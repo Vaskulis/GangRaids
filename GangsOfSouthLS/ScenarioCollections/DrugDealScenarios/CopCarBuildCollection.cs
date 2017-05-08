@@ -1,9 +1,9 @@
 ﻿using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using System.Collections.Generic;
 
-namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
+namespace GangsOfSouthLS.ScenarioCollections.DrugDealScenarios
 {
-    internal class CopCarsBuilds
+    internal class CopCarsBuildCollection
     {
         internal static CopCarBuild police = new CopCarBuild
         (

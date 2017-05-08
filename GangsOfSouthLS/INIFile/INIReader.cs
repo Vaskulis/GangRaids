@@ -11,6 +11,10 @@ namespace GangsOfSouthLS.INIFile
         internal static Keys MenuKey;
         internal static Keys MenuModifierKey;
         internal static string UnitName;
+        internal static string MenuKeyString
+        {
+            get { return getMenuKeyNameString(); }
+        }
 
         internal static bool RequestAirSupport;
 
@@ -104,6 +108,15 @@ namespace GangsOfSouthLS.INIFile
             {
                 UnmarkedCarList.Add(car.ToLower());
             }
+        }
+
+        private static string getMenuKeyNameString()
+        {
+            if (MenuModifierKey != Keys.None)
+            {
+                return MenuModifierKey.ToString() + " + " + MenuKey.ToString();
+            }
+            return MenuKey.ToString();
         }
     }
 }

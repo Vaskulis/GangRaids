@@ -19,6 +19,10 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
         {
             CrimeSentenceDict = new Dictionary<string, int> { };
         }
+        public MyPed(Vector3 position, float heading) : base(position, heading)
+        {
+            CrimeSentenceDict = new Dictionary<string, int> { };
+        }
 
         public void AddCrimeToList(string Crime, int MonthsPrison)
         {

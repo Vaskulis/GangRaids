@@ -3,11 +3,11 @@ using GangsOfSouthLS.HelperClasses.DrugDealHelpers;
 using Rage;
 using System.Collections.Generic;
 
-namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
+namespace GangsOfSouthLS.ScenarioCollections.DrugDealScenarios
 {
-    internal static class ScenarioSchemeCollection
+    internal static class ScenarioTemplateCollection
     {
-        internal static ScenarioScheme Scenario1 = new ScenarioScheme
+        internal static ScenarioTemplate Scenario1 = new ScenarioTemplate
         (
             "Scenario1",
             new List<CopCarWayPoint>
@@ -18,10 +18,10 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             },
             new List<CopCarBuild>
             {
-                CopCarsBuilds.police,
-                CopCarsBuilds.police2,
-                CopCarsBuilds.police3,
-                CopCarsBuilds.fbi2
+                CopCarsBuildCollection.police,
+                CopCarsBuildCollection.police2,
+                CopCarsBuildCollection.police3,
+                CopCarsBuildCollection.fbi2
             },
             new List<Pos4>
             {
@@ -40,7 +40,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(859.6678f, -1057.579f, 28.01464f)
         );
 
-        internal static ScenarioScheme Scenario2 = new ScenarioScheme
+        internal static ScenarioTemplate Scenario2 = new ScenarioTemplate
         (
             "Scenario2",
             new List<CopCarWayPoint>
@@ -51,10 +51,10 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             },
             new List<CopCarBuild>
             {
-                        CopCarsBuilds.police,
-                        CopCarsBuilds.police2,
-                        CopCarsBuilds.police3,
-                        CopCarsBuilds.fbi2
+                        CopCarsBuildCollection.police,
+                        CopCarsBuildCollection.police2,
+                        CopCarsBuildCollection.police3,
+                        CopCarsBuildCollection.fbi2
             },
             new List<Pos4>
             {
@@ -73,7 +73,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(251.9744f, -1976.815f, 21.21008f)
         );
 
-        internal static ScenarioScheme Scenario3 = new ScenarioScheme
+        internal static ScenarioTemplate Scenario3 = new ScenarioTemplate
         (
             "Scenario3",
             new List<CopCarWayPoint>
@@ -84,10 +84,10 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             },
             new List<CopCarBuild>
             {
-                                CopCarsBuilds.police,
-                                CopCarsBuilds.police2,
-                                CopCarsBuilds.police3,
-                                CopCarsBuilds.fbi2
+                                CopCarsBuildCollection.police,
+                                CopCarsBuildCollection.police2,
+                                CopCarsBuildCollection.police3,
+                                CopCarsBuildCollection.fbi2
             },
             new List<Pos4>
             {
@@ -106,7 +106,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(148.6301f, -1506.425f, 28.76328f)
         );
 
-        internal static ScenarioScheme Scenario4 = new ScenarioScheme
+        internal static ScenarioTemplate Scenario4 = new ScenarioTemplate
         (
             "Scenario4",
             new List<CopCarWayPoint>
@@ -117,10 +117,10 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             },
             new List<CopCarBuild>
             {
-                                        CopCarsBuilds.police,
-                                        CopCarsBuilds.police2,
-                                        CopCarsBuilds.police3,
-                                        CopCarsBuilds.fbi2
+                                        CopCarsBuildCollection.police,
+                                        CopCarsBuildCollection.police2,
+                                        CopCarsBuildCollection.police3,
+                                        CopCarsBuildCollection.fbi2
             },
             new List<Pos4>
             {
@@ -139,7 +139,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(-240.4324f, -1644.087f, 33.05951f)
         );
 
-        internal static ScenarioScheme Scenario5 = new ScenarioScheme
+        internal static ScenarioTemplate Scenario5 = new ScenarioTemplate
         (
             "Scenario5",
             new List<CopCarWayPoint>
@@ -150,10 +150,10 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             },
             new List<CopCarBuild>
             {
-                        CopCarsBuilds.police,
-                        CopCarsBuilds.police2,
-                        CopCarsBuilds.police3,
-                        CopCarsBuilds.fbi2
+                        CopCarsBuildCollection.police,
+                        CopCarsBuildCollection.police2,
+                        CopCarsBuildCollection.police3,
+                        CopCarsBuildCollection.fbi2
             },
             new List<Pos4>
             {
@@ -172,7 +172,7 @@ namespace GangsOfSouthLS.Scenarios.DrugDealScenarios
             new Vector3(459.4813f, -1516.511f, 28.8147f)
         );
 
-        internal static List<ScenarioScheme> ScenarioSchemeList = new List<ScenarioScheme>
+        internal static List<ScenarioTemplate> ScenarioTemplateList = new List<ScenarioTemplate>
         {
             Scenario1,
             Scenario2,

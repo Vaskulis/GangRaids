@@ -1,11 +1,11 @@
 ﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
-using GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios;
+using GangsOfSouthLS.ScenarioCollections.ProtectionRacketeeringScenarios;
 using Rage;
 using System.Collections.Generic;
 
 namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
 {
-    internal class ScenarioScheme
+    internal class ScenarioTemplate
     {
         internal string Name { get; private set; }
         internal Pos4 MerchantSpawnPos4 { get; private set; }
@@ -21,7 +21,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         internal Pos4 ParkingPos4 { get { return WaypointCollection.ParkingPos4; } }
         internal string AudioString { get; private set; }
 
-        internal ScenarioScheme
+        internal ScenarioTemplate
             (
             string name,
             Pos4 merchantSpawnPos4,
@@ -44,19 +44,19 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
             AudioString = audioString;
         }
 
-        internal static bool ChooseScenario(out ScenarioScheme scenarioScheme)
+        internal static bool ChooseScenario(out ScenarioTemplate scenarioTemplate)
         {
             var playerPos = Game.LocalPlayer.Character.Position;
-            var schemeList = ScenarioSchemeCollection.ScenarioSchemeList;
-            schemeList.Shuffle();
-            scenarioScheme = null;
+            var TemplateList = ScenarioTemplateCollection.ScenarioTemplateList;
+            TemplateList.Shuffle();
+            scenarioTemplate = null;
             var foundOne = false;
-            foreach (var item in schemeList)
+            foreach (var item in TemplateList)
             {
                 if ((playerPos.DistanceTo(item.Position) < 750f) && (playerPos.DistanceTo(item.Position) > 150f))
                 {
-                    scenarioScheme = item;
-                    scenarioScheme.WaypointCollection = scenarioScheme.WaypointCollectionList.RandomElement();
+                    scenarioTemplate = item;
+                    scenarioTemplate.WaypointCollection = scenarioTemplate.WaypointCollectionList.RandomElement();
                     foundOne = true;
                     Game.LogTrivial(string.Format("[GangsOfSouthLS] Chose Scenario: {0}", item.Name));
                     break;

@@ -35,19 +35,19 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         internal string ShopNameString { get; private set; }
         private KeyValuePair<List<string>, string> PedKeyValuePair;
 
-        internal Scenario(ScenarioScheme scheme)
+        internal Scenario(ScenarioTemplate Template)
         {
-            Name = scheme.Name;
-            CarSpawnPos4 = scheme.CarSpawnPos4;
-            ParkingPos4 = scheme.ParkingPos4;
-            MerchantSpawnPos4 = scheme.MerchantSpawnPos4;
-            RacketeerShopPos4 = scheme.RacketeerShopPos4;
-            Position = scheme.Position;
-            MerchantStringList = scheme.MerchantPedStringList;
-            DoorLocation = scheme.DoorLocation;
-            DoorModelNames = scheme.DoorModelNames;
-            CarWaypointPos4 = scheme.CarWaypointPos4;
-            ShopNameString = scheme.AudioString;
+            Name = Template.Name;
+            CarSpawnPos4 = Template.CarSpawnPos4;
+            ParkingPos4 = Template.ParkingPos4;
+            MerchantSpawnPos4 = Template.MerchantSpawnPos4;
+            RacketeerShopPos4 = Template.RacketeerShopPos4;
+            Position = Template.Position;
+            MerchantStringList = Template.MerchantPedStringList;
+            DoorLocation = Template.DoorLocation;
+            DoorModelNames = Template.DoorModelNames;
+            CarWaypointPos4 = Template.CarWaypointPos4;
+            ShopNameString = Template.AudioString;
             GunList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
             PedKeyValuePair = badBoyPedStringListDict.RandomElement();
             GangNameString = PedKeyValuePair.Value;

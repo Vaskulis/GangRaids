@@ -1,7 +1,7 @@
 ﻿using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
 using System.Collections.Generic;
 
-namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
+namespace GangsOfSouthLS.ScenarioCollections.ProtectionRacketeeringScenarios
 {
     internal static class ConversationPartCollection
     {

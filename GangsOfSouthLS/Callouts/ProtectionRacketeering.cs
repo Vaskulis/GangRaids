@@ -1,7 +1,7 @@
 ﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
 using GangsOfSouthLS.INIFile;
-using GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios;
+using GangsOfSouthLS.ScenarioCollections.ProtectionRacketeeringScenarios;
 using LSPD_First_Response.Mod.API;
 using LSPD_First_Response.Mod.Callouts;
 using Rage;
@@ -16,7 +16,7 @@ namespace GangsOfSouthLS.Callouts
     internal class ProtectionRacketeering : Callout
     {
         internal static Scenario Scenario;
-        internal static ScenarioScheme ScenarioScheme;
+        internal static ScenarioTemplate ScenarioTemplate;
         internal static ERacketState RacketState;
 
         private LHandle Pursuit;
@@ -45,13 +45,13 @@ namespace GangsOfSouthLS.Callouts
 
         public override bool OnBeforeCalloutDisplayed()
         {
-            var scenarioFound = ScenarioScheme.ChooseScenario(out ScenarioScheme);
+            var scenarioFound = ScenarioTemplate.ChooseScenario(out ScenarioTemplate);
             if (!scenarioFound)
             {
                 Game.LogTrivial("[GangsOfSouthLS] Could not find scenario in range.");
                 return false;
             }
-            Scenario = new Scenario(ScenarioScheme);
+            Scenario = new Scenario(ScenarioTemplate);
             Suspectlist = new List<MyPed> { };
             RacketConversation = new Conversation(ConversationPartCollection.ConverstaionPartsCollections);
             CalloutMessage = "Protection Racketeering ~w~at ~y~" + Scenario.Name;

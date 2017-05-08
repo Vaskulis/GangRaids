@@ -110,6 +110,11 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
 
         internal static void RandomizePlate(this Vehicle vehicle)
         {
+            vehicle.LicensePlate = GetRandomLicensePlate();
+        }
+
+        internal static string GetRandomLicensePlate()
+        {
             var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             var numbers = "0123456789";
             var newplate = "";
@@ -125,7 +130,7 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
             {
                 newplate += numbers.RandomElement();
             }
-            vehicle.LicensePlate = newplate;
+            return newplate;
         }
 
         internal static bool SafelyIsDeadOrArrested(this Ped ped, bool testGettingArrested = false)

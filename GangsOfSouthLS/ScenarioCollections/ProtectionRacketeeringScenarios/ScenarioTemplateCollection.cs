@@ -3,11 +3,11 @@ using GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers;
 using Rage;
 using System.Collections.Generic;
 
-namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
+namespace GangsOfSouthLS.ScenarioCollections.ProtectionRacketeeringScenarios
 {
-    internal static class ScenarioSchemeCollection
+    internal static class ScenarioTemplateCollection
     {
-        private static ScenarioScheme Scenario1 = new ScenarioScheme
+        private static ScenarioTemplate Scenario1 = new ScenarioTemplate
         (
             "247 Supermarket",
             new Pos4(25.02721f, -1342.898f, 29.49704f, 221.721f),
@@ -22,7 +22,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             }
         );
 
-        private static ScenarioScheme Scenario2 = new ScenarioScheme
+        private static ScenarioTemplate Scenario2 = new ScenarioTemplate
         (
             "Davis Herr Kutz Barber",
             new Pos4(137.8611f, -1706.771f, 29.29162f, 132.6466f),
@@ -39,7 +39,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             "HERRKUTZBARBERSHOP"
         );
 
-        private static ScenarioScheme Scenario3 = new ScenarioScheme
+        private static ScenarioTemplate Scenario3 = new ScenarioTemplate
         (
             "Discount Store",
             new Pos4(75.82664f, -1390.549f, 29.37615f, 258.0114f),
@@ -55,7 +55,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             "SOUTHLSATMDISCOUNTSTORE"
         );
 
-        private static ScenarioScheme Scenario4 = new ScenarioScheme
+        private static ScenarioTemplate Scenario4 = new ScenarioTemplate
         (
             "LTD Gas Station",
             new Pos4(-44.41323f, -1754.978f, 29.42101f, 86.94448f),
@@ -71,7 +71,7 @@ namespace GangsOfSouthLS.Scenarios.ProtectionRacketeeringScenarios
             "NONE"
         );
 
-        internal static List<ScenarioScheme> ScenarioSchemeList = new List<ScenarioScheme>
+        internal static List<ScenarioTemplate> ScenarioTemplateList = new List<ScenarioTemplate>
         {
             Scenario1,
             Scenario2,

@@ -1,13 +1,13 @@
 ﻿using GangsOfSouthLS.HelperClasses.CommonUtilities;
-using GangsOfSouthLS.Scenarios.DrugDealScenarios;
+using GangsOfSouthLS.ScenarioCollections.DrugDealScenarios;
 using Rage;
 using System.Collections.Generic;
 
 namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
 {
-    internal class ScenarioScheme
+    internal class ScenarioTemplate
     {
-        internal ScenarioScheme
+        internal ScenarioTemplate
             (
             string name,
             List<CopCarWayPoint> copCarWayPointList,
@@ -32,18 +32,18 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         internal string Name { get; private set; }
         internal Vector3 Position { get; private set; }
 
-        internal static bool ChooseScenario(out ScenarioScheme scenarioScheme)
+        internal static bool ChooseScenario(out ScenarioTemplate scenarioTemplate)
         {
             var playerPos = Game.LocalPlayer.Character.Position;
-            var schemeList = ScenarioSchemeCollection.ScenarioSchemeList;
-            schemeList.Shuffle();
-            scenarioScheme = null;
+            var TemplateList = ScenarioTemplateCollection.ScenarioTemplateList;
+            TemplateList.Shuffle();
+            scenarioTemplate = null;
             var foundOne = false;
-            foreach (var item in schemeList)
+            foreach (var item in TemplateList)
             {
                 if ((playerPos.DistanceTo(item.Position) < 750f) && (playerPos.DistanceTo(item.Position) > 250f))
                 {
-                    scenarioScheme = item;
+                    scenarioTemplate = item;
                     foundOne = true;
                     Game.LogTrivial(string.Format("[GangsOfSouthLS] Chose Scenario: {0}", item.Name));
                     break;

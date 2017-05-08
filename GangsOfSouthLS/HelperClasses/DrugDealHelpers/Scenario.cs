@@ -32,20 +32,20 @@ namespace GangsOfSouthLS.HelperClasses.DrugDealHelpers
         private List<string> badBoyPistolList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
         private List<string> badBoyBigGunList = new List<string> { "weapon_assaultrifle", "weapon_pumpshotgun", "weapon_sawnoffshotgun", "weapon_smg" };
 
-        internal Scenario(ScenarioScheme scheme)
+        internal Scenario(ScenarioTemplate Template)
         {
-            Name = scheme.Name;
-            CopCarBuildList = new List<CopCarBuild>(scheme.CopCarBuildList);
-            CopCarWayPointList = new List<CopCarWayPoint>(scheme.CopCarWayPointList);
-            dealerVanSpawnPos4 = scheme.BadGuyCarSpawnPos4List[0].Copy();
-            dealerCarSpawnPos4 = scheme.BadGuyCarSpawnPos4List[1].Copy();
-            buyerCarSpawnPos4 = scheme.BadGuyCarSpawnPos4List[2].Copy();
-            dealer1SpawnPos4 = scheme.BadGuyPedSpawnPos4List[0].Copy();
-            dealer2SpawnPos4 = scheme.BadGuyPedSpawnPos4List[1].Copy();
-            dealer3SpawnPos4 = scheme.BadGuyPedSpawnPos4List[2].Copy();
-            buyer1SpawnPos4 = scheme.BadGuyPedSpawnPos4List[3].Copy();
-            buyer2SpawnPos4 = scheme.BadGuyPedSpawnPos4List[4].Copy();
-            Position = scheme.Position.Copy();
+            Name = Template.Name;
+            CopCarBuildList = new List<CopCarBuild>(Template.CopCarBuildList);
+            CopCarWayPointList = new List<CopCarWayPoint>(Template.CopCarWayPointList);
+            dealerVanSpawnPos4 = Template.BadGuyCarSpawnPos4List[0].Copy();
+            dealerCarSpawnPos4 = Template.BadGuyCarSpawnPos4List[1].Copy();
+            buyerCarSpawnPos4 = Template.BadGuyCarSpawnPos4List[2].Copy();
+            dealer1SpawnPos4 = Template.BadGuyPedSpawnPos4List[0].Copy();
+            dealer2SpawnPos4 = Template.BadGuyPedSpawnPos4List[1].Copy();
+            dealer3SpawnPos4 = Template.BadGuyPedSpawnPos4List[2].Copy();
+            buyer1SpawnPos4 = Template.BadGuyPedSpawnPos4List[3].Copy();
+            buyer2SpawnPos4 = Template.BadGuyPedSpawnPos4List[4].Copy();
+            Position = Template.Position.Copy();
             BadBoyCarList = new List<Vehicle> { };
             CopCarDict = new Dictionary<Vehicle, CopCarWayPoint> { };
             Dealer3WasSpawned = false;
