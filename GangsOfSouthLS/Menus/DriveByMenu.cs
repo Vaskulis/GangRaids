@@ -30,7 +30,7 @@ namespace GangsOfSouthLS.Menus
         internal static Dictionary<string, string> InformationDict;
 
         private static TabSubmenuItem ActionTab;
-        internal static List<TabItem> ActionList;
+        private static Dictionary<TabItem, EventHandler> ActionItemDict;
 
         internal static void Initialize()
         {
@@ -38,15 +38,16 @@ namespace GangsOfSouthLS.Menus
             MainTabView = new TabView("Drive-By Shooting Menu");
 
             InformationDict = new Dictionary<string, string> { };
-            ActionList = new List<TabItem> { };
+            ActionItemDict = new Dictionary<TabItem, EventHandler> { };
 
             InformationListTab = new TabItemSimpleList("Vehicle Information", InformationDict);
-            ActionTab = new TabSubmenuItem("Actions", ActionList);
+            ActionTab = new TabSubmenuItem("Actions", ActionItemDict.Keys);
 
             MainTabView.Tabs.Add(InformationListTab);
             MainTabView.RefreshIndex();
             Initialized = true;
         }
+
 
         internal static void Terminate()
         {
@@ -57,6 +58,7 @@ namespace GangsOfSouthLS.Menus
                 Initialized = false;
             }
         }
+
 
         private static void Process(object sender, GraphicsEventArgs e)
         {
@@ -71,13 +73,14 @@ namespace GangsOfSouthLS.Menus
             MainTabView.Update();
         }
 
+
         internal static void AddActionToMenu(string title, EventHandler action)
         {
             MainTabView.Visible = false;
             var actionTabItem = new TabItem(title);
             actionTabItem.Activated += action;
-            ActionList.Add(actionTabItem);
-            ActionTab.Items = ActionList;
+            ActionItemDict.Add(actionTabItem, action);
+            ActionTab.Items = ActionItemDict.Keys.ToList();
             if (!MainTabView.Tabs.Contains(ActionTab))
             {
                 MainTabView.Tabs.Add(ActionTab);
@@ -85,11 +88,15 @@ namespace GangsOfSouthLS.Menus
             }
         }
 
-        internal static void RemoveActionFromMenu(string title)
+
+        internal static void RemoveActionFromMenu(EventHandler action)
         {
             MainTabView.Visible = false;
-            ActionList.RemoveAll(actionTab => actionTab.Title == title);
-            if (ActionList.Count == 0)
+            foreach(var actionItem in ActionItemDict.Where(kvp => kvp.Value == action).ToList())
+            {
+                ActionItemDict.Remove(actionItem.Key);
+            }
+            if (ActionItemDict.Count == 0)
             {
                 MainTabView.Tabs.Remove(ActionTab);
                 MainTabView.RefreshIndex();

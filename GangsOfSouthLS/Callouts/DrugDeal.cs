@@ -64,7 +64,7 @@ namespace GangsOfSouthLS.Callouts
             Scenario = new Scenario(ScenarioTemplate);
             CalloutMessage = "Drug deal in progress";
             CalloutPosition = Scenario.Position;
-            Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_DRUGDEAL IN_OR_ON_POSITION UNITS_RESPOND_CODE_02_02", INIReader.UnitName), Scenario.Position);
+            Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_DRUGDEAL IN_OR_ON_POSITION UNITS_RESPOND_CODE_02_02", INIReader.UnitNameAudio), Scenario.Position);
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 70f);
             DealersAndBuyersHateEachOther = false;
             Buyer2IsFightingStraightAway = false;
@@ -120,7 +120,7 @@ namespace GangsOfSouthLS.Callouts
                 if (Game.LocalPlayer.Character.Position.DistanceTo(Scenario.Position) < 200f)
                 {
                     SuspectsAreaBlip.DisableRoute();
-                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitName + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangsOfSouthLS_PROCEED_WITH_CAUTION");
+                    Functions.PlayScannerAudio("DISP_ATTENTION_UNIT_02 " + INIReader.UnitNameAudio + " SUSPECTS_ARE_MEMBERS_OF " + Scenario.DealerGangNameString + " GangsOfSouthLS_PROCEED_WITH_CAUTION");
                     DrugDealState = EDrugDealState.InPreparation;
                     foreach (var suspect in Scenario.DealerList)
                     {

@@ -12,6 +12,7 @@ using GangsOfSouthLS.HelperClasses.CommonUtilities;
 using System.Drawing;
 using GangsOfSouthLS.Menus;
 using GangsOfSouthLS.INIFile;
+using GangsOfSouthLS.ScenarioCollections.DriveByShootingScenarios;
 
 namespace GangsOfSouthLS.Callouts
 {
@@ -19,12 +20,18 @@ namespace GangsOfSouthLS.Callouts
     class DriveByShooting : Callout
     {
         internal static CrimeSceneScenarioTemplate ScenarioTemplate;
-        internal static Scenario Scenario;
+        internal static CrimeSceneScenario Scenario;
         internal static EDriveByState DriveByState;
         internal SuspectCarTemplate CarTemplate;
-        internal static Questioning Questioning;
+        internal static Statements Statements;
+
+        internal static Blip CrimeSceneBlip;
+
+        internal static CorrectOwnerHouseScenario COHS;
 
         internal static bool IsCurrentlyRunning = false;
+        internal static Statements.EStatementsQuality StatementsQuality;
+
 
         public override bool OnBeforeCalloutDisplayed()
         {
@@ -34,7 +41,7 @@ namespace GangsOfSouthLS.Callouts
                 Game.LogTrivial("[GangsOfSouthLS] Could not find scenario in range.");
                 return false;
             }
-            Scenario = new Scenario(ScenarioTemplate);
+            Scenario = new CrimeSceneScenario(ScenarioTemplate);
             CalloutMessage = "Drive-by shooting";
             CalloutPosition = Scenario.Position;
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 70f);
@@ -46,6 +53,10 @@ namespace GangsOfSouthLS.Callouts
         {
             Scenario.Initialize();
             CarTemplate = new SuspectCarTemplate();
+            CrimeSceneBlip = new Blip(CalloutPosition, 50f);
+            CrimeSceneBlip.Alpha = 0.5f;
+            CrimeSceneBlip.Color = Color.Yellow;
+            CrimeSceneBlip.EnableRoute(Color.Yellow);
             DriveByState = EDriveByState.Accepted;
             IsCurrentlyRunning = true;
             return base.OnCalloutAccepted();
@@ -60,34 +71,101 @@ namespace GangsOfSouthLS.Callouts
             {
                 if (Game.LocalPlayer.Character.DistanceTo(Scenario.Position) < 100f)
                 {
+                    CrimeSceneBlip.SafelyDelete();
+                    Game.LogTrivial("[GangsOfSouthLS] Arrived on scene.");
                     DriveByState = EDriveByState.ArrivedOnScene;
                 }
             }
 
             if (DriveByState == EDriveByState.ArrivedOnScene)
             {
-                Questioning = new Questioning(Scenario.WitnessList, CarTemplate);
+                Statements = new Statements(Scenario.WitnessList, CarTemplate);
                 DriveByMenu.Initialize();
-                DriveByState = EDriveByState.InQuestioning;
+                DriveByState = EDriveByState.TakingStatements;
             }
 
-            if (DriveByState == EDriveByState.InQuestioning)
+            if (DriveByState == EDriveByState.TakingStatements)
             {
-                if (Questioning.IsFinished)
+                if (Statements.IsFinished)
                 {
-                    DriveByMenu.AddActionToMenu("Get further information from dispatch", InformDispatchAction);
-                    DriveByState = EDriveByState.FinishedQuestioning;
+                    StatementsQuality = Statements.Quality;
+                    Game.LogTrivial("[GangsOfSouthLS] Finished taking statements. Quality: " + StatementsQuality.ToString());
+                    DriveByMenu.AddActionToMenu("Report status to dispatch", InformDispatchAction);
+                    DriveByState = EDriveByState.FinishedTakingStatements;
                 }
             }
 
-            if (DriveByState == EDriveByState.FinishedQuestioning)
+            if (DriveByState == EDriveByState.FinishedTakingStatements)
+            {
+                Game.DisplayHelp("Open your menu with ~b~" + INIReader.MenuKeyString + "~w~ and use the Actions tab to report your findings to dispatch");
+            }
+
+            if (DriveByState == EDriveByState.Waiting)
             {
                 GameFiber.Yield();
             }
 
             if (DriveByState == EDriveByState.ReadyToEnd)
             {
-                End();
+                Game.DisplayHelp("Press End to end.");
+                if (Game.IsKeyDown(Keys.End))
+                {
+                    End();
+                }
+            }
+
+            if (DriveByState == EDriveByState.Evaluating)
+            {
+                DriveByState = EDriveByState.Waiting;
+
+                var OHSTList = new List<OwnerHouseScenarioTemplate>(OwnerHouseScenarioTemplateCollection.OwnerHouseScenarioTemplateList);
+                var COHST = OHSTList.RandomElement();
+                OHSTList.Remove(COHST);
+
+                var carStolen = false;
+                //if (UsefulFunctions.Decide(20))
+                //{
+                //    carStolen = true;
+                //}
+                GameFiber.StartNew(delegate
+                {
+                    if (StatementsQuality == Statements.EStatementsQuality.Definite && carStolen)
+                    {
+                        Game.DisplaySubtitle("~g~Dispatch~w~: The car was reported stolen by its owner a few days ago.", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        Game.DisplaySubtitle("~g~Dispatch~w~: I'm putting out an APB on it in your area.", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    }
+                    else if (StatementsQuality == Statements.EStatementsQuality.Definite && !carStolen)
+                    {
+                        COHS = new CorrectOwnerHouseScenario(COHST, CarTemplate, Scenario);
+                        var Owner = COHS.SuspectList[0];
+
+                        Game.LogTrivial("[GangsOfSouthLS] Owner Address: " + COHS.Address);
+
+                        Game.DisplaySubtitle("~g~Dispatch~w~: Alright, I've found it.", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        Game.DisplaySubtitle("~g~Dispatch~w~: The owner is " + Owner.Name + ", a " + Owner.Age + " year old " + Owner.Gender.ToLower() + ",", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        Game.DisplaySubtitle("~g~Dispatch~w~: living at " + COHS.Address + ".", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        Game.DisplaySubtitle("~g~Dispatch~w~: Be advised, suspect is a member of the " + Scenario.SuspectGang.ToString() + " and possibly armed.", 4500);
+                        Statements.CompleteInformation();
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        Game.DisplaySubtitle("~b~You~w~: 10-4. I'm going to check out the residence.", 4500);
+                        GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                        DriveByState = EDriveByState.CorrectResidenceAction;
+                    }
+                });
+            }
+
+            if (DriveByState == EDriveByState.CorrectResidenceAction)
+            {
+                COHS.PlayAction();
+                if (COHS.State == CorrectOwnerHouseScenario.ECOHSState.Ending)
+                {
+                    DriveByState = EDriveByState.ReadyToEnd;
+                }
             }
         }
 
@@ -96,6 +174,7 @@ namespace GangsOfSouthLS.Callouts
         {
             IsCurrentlyRunning = false;
             DriveByMenu.Terminate();
+            CrimeSceneBlip.SafelyDelete();
             if (Scenario != null)
             {
                 if (Scenario.VictimList != null)
@@ -121,59 +200,94 @@ namespace GangsOfSouthLS.Callouts
                 }
                 Scenario.Ambulance.SafelyDelete();
             }
+            if (COHS != null)
+            {
+                COHS.End();
+            }
             base.End();
         }
 
+
         internal enum EDriveByState
         {
-            Accepted, ArrivedOnScene, InQuestioning, FinishedQuestioning, ReadyToEnd
+            Accepted,
+            ArrivedOnScene,
+            TakingStatements,
+            FinishedTakingStatements,
+            Waiting,
+            Evaluating,
+            CorrectResidenceAction,
+            DispatchSendingDefiniteLocation,
+            DispatchSendingMultipleLocations,
+            ReadyToEnd
         }
+
 
         internal static void InformDispatchAction(object sender, EventArgs e)
         {
-            var radioSequence = new TaskSequence(Game.LocalPlayer.Character);
-            radioSequence.Tasks.PlayAnimation("random@arrests", "generic_radio_enter", 6f, AnimationFlags.UpperBodyOnly | AnimationFlags.SecondaryTask);
-            radioSequence.Tasks.PlayAnimation("random@arrests", "generic_radio_exit", 6f, AnimationFlags.UpperBodyOnly | AnimationFlags.SecondaryTask);
-            GameFiber.StartNew(delegate { radioSequence.Execute(); });
+            DriveByMenu.RemoveActionFromMenu(InformDispatchAction);
+
+            DriveByState = EDriveByState.Waiting;
+            PlayRadioAnimationWhileState(EDriveByState.Waiting);
+
             GameFiber.StartNew(delegate
             {
-                var quality = Questioning.Quality;
-                Game.DisplaySubtitle("~b~You~w~: Unit " + INIReader.UnitName + " to dispatch. I'm on scene at the drive-by attack.", 4500);
-                GameFiber.Wait(4700);
-                if (quality == Questioning.EQuestioningQuality.Definite)
+                Game.DisplaySubtitle("~b~You~w~: Unit " + INIReader.UnitNameReadable + " to dispatch. I'm on scene at the drive-by attack.", 4500);
+                GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                if (StatementsQuality == Statements.EStatementsQuality.Definite)
                 {
-                    Game.DisplaySubtitle("~b~You~w~: A witness saw the vehicle's license plate. It's " + Questioning.CarTemplate.LicensePlate, 4500);
-                    GameFiber.Wait(4700);
-                    Game.DisplaySubtitle("~b~You~w~: Could you please run them for me?", 4500);
-                    GameFiber.Wait(4700);
+                    Game.DisplaySubtitle("~b~You~w~: A witness saw the vehicle's license plate. It's " + Statements.CarTemplate.LicensePlate +".", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    Game.DisplaySubtitle("~b~You~w~: Could you please run it for me?", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    Game.DisplaySubtitle("~g~Dispatch~w~: Checking it now.", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    DriveByState = EDriveByState.Evaluating;
                 }
-                else if (quality == Questioning.EQuestioningQuality.Useless)
+                else if (StatementsQuality == Statements.EStatementsQuality.Useless)
                 {
                     Game.DisplaySubtitle("~b~You~w~: Witnesses here aren't very helpful, I'm afraid.", 4500);
-                    GameFiber.Wait(4700);
-                    Game.DisplaySubtitle("~b~You~w~: Some of them saw a " + Questioning.GetDescription() + ". But that's about all.", 4500);
-                    GameFiber.Wait(4700);
-                    Game.DisplaySubtitle("~b~You~w~: Also, at least one of the victims appears to be a member of " + Scenario.VictimGang.ToString() + ".", 4500);
-                    GameFiber.Wait(4700);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    Game.DisplaySubtitle("~b~You~w~: Some of them saw a " + Statements.GetDescription() + ", but that's about all.", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    Game.DisplaySubtitle("~b~You~w~: Also, at least one of the victims appears to be a member of the " + Scenario.VictimGang.ToString() + ".", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
                     Game.DisplaySubtitle("~g~Dispatch~w~: Thank you, officer. Please clear the scene and continue your patrol. We will be expecting a full report.", 4500);
-                    GameFiber.Wait(4700);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    DriveByState = EDriveByState.ReadyToEnd;
                 }
-                else if (quality == Questioning.EQuestioningQuality.Ambiguous)
+                else if (StatementsQuality == Statements.EStatementsQuality.Ambiguous)
                 {
-                    Game.DisplaySubtitle("~b~You~w~: Witnesses saw a " + Questioning.GetDescription() +". No plates, unfortunately.", 4500);
-                    GameFiber.Wait(4700);
-                    Game.DisplaySubtitle("~b~You~w~: Also, at least one of the victims appears to be a member of " + Scenario.VictimGang.ToString() + ".", 4500);
-                    GameFiber.Wait(4700);
+                    Game.DisplaySubtitle("~b~You~w~: Witnesses saw a " + Statements.GetDescription() +". No plates, unfortunately.", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    Game.DisplaySubtitle("~b~You~w~: Also, at least one of the victims appears to be a member of the " + Scenario.VictimGang.ToString() + ".", 4500);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
                     Game.DisplaySubtitle("~g~Dispatch~w~: Thank you officer. I'm checking for possible suspects, hang on.", 4500);
-                    GameFiber.Wait(4700);
+                    GameFiber.WaitUntil(() => Game.IsKeyDown(Keys.Y), 4700);
+                    DriveByState = EDriveByState.ReadyToEnd;
                 }
-                DriveByMenu.AddActionToMenu("End Callout", EndCalloutAction);
             });
         }
+
 
         internal static void EndCalloutAction(object sender, EventArgs e)
         {
             DriveByState = EDriveByState.ReadyToEnd;
+        }
+
+
+        internal static void PlayRadioAnimationWhileState(EDriveByState state)
+        {
+            GameFiber.StartNew(delegate
+            {
+                Game.LocalPlayer.Character.Tasks.PlayAnimation("random@arrests", "generic_radio_enter", 6f, AnimationFlags.UpperBodyOnly | AnimationFlags.SecondaryTask).WaitForCompletion(2000);
+                Game.LocalPlayer.Character.Tasks.PlayAnimation("random@arrests", "generic_radio_idle", 6f, AnimationFlags.UpperBodyOnly | AnimationFlags.SecondaryTask | AnimationFlags.Loop);
+                while (DriveByState == state)
+                {
+                    GameFiber.Yield();
+                }
+                Game.LocalPlayer.Character.Tasks.PlayAnimation("random@arrests", "generic_radio_exit", 6f, AnimationFlags.UpperBodyOnly | AnimationFlags.SecondaryTask).WaitForCompletion(2000);
+            });
         }
     }
 }

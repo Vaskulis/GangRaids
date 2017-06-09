@@ -10,21 +10,20 @@ using System.Windows.Forms;
 
 namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 {
-    internal class Questioning
+    internal class Statements
     {
         internal SuspectCarTemplate CarTemplate;
         internal EInformation CollectedInfo;
-        internal EQuestioningQuality Quality
+        internal EStatementsQuality Quality
         {
-            get { return GetQuestioningQuality(); }
+            get { return GetStatementsQuality(); }
         }
 
         internal bool IsFinished
         {
-            get { return (WitnessDict.Count == 0); }
+            get { return (PedAnswerDict.Count == 0); }
         }
 
-        internal Dictionary<MyPed, Blip> WitnessDict { get; private set; }
         private Dictionary<MyPed, Answer> PedAnswerDict;
 
         private List<Answer> PossibleAnswers = new List<Answer>
@@ -54,16 +53,15 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             Address = 16,
         }
 
-        internal enum EQuestioningQuality
+        internal enum EStatementsQuality
         {
             Useless, Ambiguous, Definite
         }
 
-        internal Questioning(List<MyPed> witnessList, SuspectCarTemplate carTemplate)
+        internal Statements(List<MyPed> witnessList, SuspectCarTemplate carTemplate)
         {
             CarTemplate = carTemplate;
             PedAnswerDict = new Dictionary<MyPed, Answer> { };
-            WitnessDict = new Dictionary<MyPed, Blip> { };
             ChosenAnswers = new List<Answer> { };
             CollectedInfo = 0;
             DriveByMenu.InformationDict = new Dictionary<string, string> { };
@@ -71,12 +69,8 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             {
                 var randomAnswer = PossibleAnswers.Except(ChosenAnswers).ToArray().RandomElement();
                 ChosenAnswers.Add(randomAnswer);
+                wit.AddBlip();
                 PedAnswerDict.Add(wit, randomAnswer);
-                var blip = new Blip(wit);
-                blip.Color = Color.Orange;
-                blip.Scale = 0.75f;
-                blip.Order = 1;
-                WitnessDict.Add(wit, blip);
             }
             GameFiber.StartNew(delegate
             {
@@ -85,7 +79,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                     Game.DisplayHelp("Press ~b~Y ~w~while standing close to a ~o~witness ~w~to get their statement. Or press ~b~" + INIReader.MenuKeyString + " ~w~to review the information you collected.");
                     if (Game.IsKeyDown(Keys.Y))
                     {
-                        var closestUnquestionedWitness = (MyPed)World.GetClosestEntity(WitnessDict.Keys.ToArray(), Game.LocalPlayer.Character.Position);
+                        var closestUnquestionedWitness = (MyPed)World.GetClosestEntity(PedAnswerDict.Keys.ToArray(), Game.LocalPlayer.Character.Position);
                         if (Game.LocalPlayer.Character.DistanceTo(closestUnquestionedWitness) < 2.5f)
                         {
                             PlayAnswer(closestUnquestionedWitness);
@@ -101,49 +95,73 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             var answer = PedAnswerDict[witness];
             answer.Play(CarTemplate);
             CollectedInfo |= answer.Information;
-            WitnessDict[witness].SafelyDelete();
-            WitnessDict.Remove(witness);
+            witness.Blip.SafelyDelete();
+            PedAnswerDict.Remove(witness);
             foreach (EInformation info in Enum.GetValues(typeof(EInformation)))
             {
-                if (answer.Information.HasFlag(info) && !DriveByMenu.InformationDict.Keys.Contains(info.ToString()))
+                if ((info != EInformation.None) && answer.Information.HasFlag(info) && !DriveByMenu.InformationDict.Keys.Contains(info.ToString()))
                 {
-                    if (info == EInformation.Color)
-                    {
-                        DriveByMenu.InformationDict.Add(info.ToString(), CarTemplate.ColorString);
-                    }
-                    if (info == EInformation.Class)
-                    {
-                        DriveByMenu.InformationDict.Add(info.ToString(), CarTemplate.VehClass);
-                    }
-                    if (info == EInformation.Model)
-                    {
-                        DriveByMenu.InformationDict.Add(info.ToString(), CarTemplate.VehModel);
-                    }
-                    if (info == EInformation.Plate)
-                    {
-                        DriveByMenu.InformationDict.Add(info.ToString(), CarTemplate.LicensePlate);
-                    }
-                    if (info == EInformation.Address)
-                    {
-                        DriveByMenu.InformationDict.Add(info.ToString(), CarTemplate.Address);
-                    }
+                    DriveByMenu.InformationDict.Add(info.ToString(), GetInfoString(info));
                 }
             }
         }
 
-        private EQuestioningQuality GetQuestioningQuality()
+
+        internal void CompleteInformation()
         {
-            if (CollectedInfo.HasFlag(EInformation.Plate))
+            foreach (EInformation info in Enum.GetValues(typeof(EInformation)))
             {
-                return EQuestioningQuality.Definite;
+                if (!CollectedInfo.HasFlag(info))
+                {
+                    DriveByMenu.InformationDict.Add(info.ToString(), GetInfoString(info));
+                }
             }
-            else if (CollectedInfo.HasFlag(EInformation.Class))
+        }
+
+
+        private string GetInfoString(EInformation info)
+        {
+            if (info == EInformation.Color)
             {
-                return EQuestioningQuality.Ambiguous;
+                return CarTemplate.ColorString;
+            }
+            else if (info == EInformation.Class)
+            {
+                return CarTemplate.VehClass;
+            }
+            else if (info == EInformation.Model)
+            {
+                return CarTemplate.VehModel;
+            }
+            else if (info == EInformation.Plate)
+            {
+                return CarTemplate.LicensePlate;
+            }
+            else if (info == EInformation.Address)
+            {
+                return CarTemplate.Address;
             }
             else
             {
-                return EQuestioningQuality.Useless;
+                Game.LogTrivial("[GangsOfSouthLS] GetInfoString couldn't find info.");
+                return "NO INFO";
+            }
+        }
+
+
+        private EStatementsQuality GetStatementsQuality()
+        {
+            if (CollectedInfo.HasFlag(EInformation.Plate))
+            {
+                return EStatementsQuality.Definite;
+            }
+            else if (CollectedInfo.HasFlag(EInformation.Class))
+            {
+                return EStatementsQuality.Ambiguous;
+            }
+            else
+            {
+                return EStatementsQuality.Useless;
             }
         }
 

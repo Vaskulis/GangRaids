@@ -8,9 +8,11 @@ namespace GangsOfSouthLS.INIFile
     internal static class INIReader
     {
         private static InitializationFile iniFile;
+
         internal static Keys MenuKey;
         internal static Keys MenuModifierKey;
-        internal static string UnitName;
+        internal static string UnitNameAudio;
+        internal static string UnitNameReadable;
         internal static string MenuKeyString
         {
             get { return getMenuKeyNameString(); }
@@ -72,27 +74,32 @@ namespace GangsOfSouthLS.INIFile
             var DivisionString = iniFile.ReadString("PERSONAL", "Division");
             var UnitTypeString = iniFile.ReadString("PERSONAL", "UnitType");
             var BeatString = iniFile.ReadString("PERSONAL", "Beat");
-            UnitName = "";
 
+            UnitNameAudio = "";
             if (DivisionString.Length == 1)
             {
-                UnitName += ("DIV_0" + DivisionString + " ");
+                UnitNameAudio += ("DIV_0" + DivisionString + " ");
             }
             else
             {
-                UnitName += ("DIV_" + DivisionString + " ");
+                UnitNameAudio += ("DIV_" + DivisionString + " ");
             }
 
-            UnitName += (UnitTypeString + " ");
+            UnitNameAudio += (UnitTypeString + " ");
 
             if (BeatString.Length == 1)
             {
-                UnitName += ("BEAT_0" + BeatString);
+                UnitNameAudio += ("BEAT_0" + BeatString);
             }
             else
             {
-                UnitName += ("BEAT_" + BeatString);
+                UnitNameAudio += ("BEAT_" + BeatString);
             }
+
+            UnitNameReadable = "";
+            UnitNameReadable += DivisionString + " ";
+            UnitNameReadable += UnitTypeString + " ";
+            UnitNameReadable += BeatString;
         }
 
         private static void SetDrugDealOptions()

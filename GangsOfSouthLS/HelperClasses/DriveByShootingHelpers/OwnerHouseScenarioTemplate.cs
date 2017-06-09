@@ -9,9 +9,9 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 {
     internal class OwnerHouseScenarioTemplate
     {
-        string Address;
-        List<Pos4> PossibleCarSpawnList;
-        List<Pos4> PossibleSuspectSpawnList;
+        internal string Address;
+        internal List<Pos4> PossibleCarSpawnList;
+        internal List<Pos4> PossibleSuspectSpawnList;
 
         internal OwnerHouseScenarioTemplate(string address, List<Pos4> possibleCarSpawnList, List<Pos4> possibleSuspectSpawnList)
         {

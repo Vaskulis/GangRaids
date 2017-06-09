@@ -81,6 +81,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             var veh = position.CreateVehicle(VehModel);
             veh.LicensePlate = LicensePlate;
             veh.PrimaryColor = ARGBColor;
+            veh.SecondaryColor = ARGBColor;
             return veh;
         }
     }

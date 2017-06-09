@@ -80,7 +80,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
         }
     }
 
-    internal class Conversation
+    internal class RacketConversation
     {
         private Dictionary<ConversationState, ConversationPartsCollection> convPartCollectionDict;
         private bool finishedTalking;
@@ -88,7 +88,7 @@ namespace GangsOfSouthLS.HelperClasses.ProtectionRacketeeringHelpers
 
         internal bool IsFinished { get; private set; }
 
-        internal Conversation(List<ConversationPartsCollection> ConvPartsCollections)
+        internal RacketConversation(List<ConversationPartsCollection> ConvPartsCollections)
         {
             convPartCollectionDict = new Dictionary<ConversationState, ConversationPartsCollection> { };
             foreach (var convPartsColl in ConvPartsCollections)

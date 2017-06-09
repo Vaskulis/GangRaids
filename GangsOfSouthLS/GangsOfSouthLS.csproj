@@ -85,27 +85,29 @@
     <Compile Include="HelperClasses\CommonUtilities\MyNatives.cs" />
     <Compile Include="HelperClasses\CommonUtilities\MyPed.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\BurnCarScenarioTemplate.cs" />
+    <Compile Include="HelperClasses\DriveByShootingHelpers\CorrectOwnerHouseScenario.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\OwnerHouseScenarioTemplate.cs" />
-    <Compile Include="HelperClasses\DriveByShootingHelpers\Questioning.cs" />
+    <Compile Include="HelperClasses\DriveByShootingHelpers\Statements.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\SuspectCarTemplate.cs" />
-    <Compile Include="HelperClasses\DriveByShootingHelpers\Scenario.cs" />
+    <Compile Include="HelperClasses\DriveByShootingHelpers\CrimeSceneScenario.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\CrimeSceneScenarioTemplate.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarBuild.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\CopCarWayPoint.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\Scenario.cs" />
     <Compile Include="HelperClasses\DrugDealHelpers\ScenarioTemplate.cs" />
-    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\Conversation.cs" />
+    <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\RacketConversation.cs" />
     <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\Scenario.cs" />
     <Compile Include="HelperClasses\ProtectionRacketeeringHelpers\ScenarioTemplate.cs" />
     <Compile Include="HelperClasses\CommonUtilities\Pos4.cs" />
     <Compile Include="HelperClasses\CommonUtilities\UsefulFunctions.cs" />
     <Compile Include="INIFile\INIReader.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Menus\Conversation.cs" />
     <Compile Include="Menus\DriveByMenu.cs" />
     <Compile Include="Menus\DrugDealMenu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenarioCollections\DriveByShootingScenarios\BurnCarScenarioTemplateCollection.cs" />
-    <Compile Include="ScenarioCollections\DriveByShootingScenarios\CarLocationScenarioTemplateCollection.cs" />
+    <Compile Include="ScenarioCollections\DriveByShootingScenarios\OwnerHouseScenarioTemplateCollection.cs" />
     <Compile Include="ScenarioCollections\DriveByShootingScenarios\CrimeSceneScenarioTemplateCollection.cs" />
     <Compile Include="ScenarioCollections\DrugDealScenarios\CopCarBuildCollection.cs" />
     <Compile Include="ScenarioCollections\DrugDealScenarios\ScenarioTemplateCollection.cs" />
@@ -116,6 +118,10 @@
     <None Include="INIFile\GangsOfSouthLS.ini" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\plugins\LSPDFR\"
+copy /y "$(TargetDir)$(TargetName).pdb"  "C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\plugins\LSPDFR\"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 {
-    class Scenario
+    class CrimeSceneScenario
     {
         internal CrimeSceneScenarioTemplate Template;
         internal Vector3 Position { get; private set; }
@@ -44,7 +44,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
         internal EGangName VictimGang;
         internal EGangName SuspectGang;
 
-        internal Scenario(CrimeSceneScenarioTemplate template)
+        internal CrimeSceneScenario(CrimeSceneScenarioTemplate template)
         {
             Template = template;
             Position = Template.Position;
@@ -57,20 +57,21 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 
         internal void Initialize()
         {
-            Ambulance = new Vehicle("ambulance", Template.AmbulanceSpawn.Position, Template.AmbulanceSpawn.Heading);
-            Ambulance.IsSirenOn = true;
-            Ambulance.IsEngineOn = true;
-            Ambulance.Doors[2].Open(true);
-            Ambulance.Doors[3].Open(true);
+            //Ambulance = new Vehicle("ambulance", Template.AmbulanceSpawn.Position, Template.AmbulanceSpawn.Heading);
+            //Ambulance.IsSirenOn = true;
+            //Ambulance.IsEngineOn = true;
+            //Ambulance.Doors[2].Open(true);
+            //Ambulance.Doors[3].Open(true);
 
             WitnessList = new List<MyPed> { };
             var witnum = 0;
             Template.WitnessSpawnList.Shuffle();
             foreach (var witPos in Template.WitnessSpawnList)
             {
+                // Spawn 1-5 witnesses
                 if (UsefulFunctions.Decide(100 - (witnum * 20)))
                 {
-                    var wit = new MyPed(witPos.Position, witPos.Heading);
+                    var wit = new MyPed(witPos.Position, witPos.Heading, MyPed.EType.Witness);
                     wit.RandomizeVariation();
                     wit.BlockPermanentEvents = true;
                     wit.IsPersistent = true;
@@ -85,9 +86,11 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             Template.VictimSpawnList.Shuffle();
             foreach (var vicPos in Template.VictimSpawnList)
             {
+                // Spawn 1-3 victims
                 if (UsefulFunctions.Decide(100 - (vicNum * 35)))
                 {
                     MyPed vic;
+                    // Decide if victim is gang member
                     if (UsefulFunctions.Decide(100 - (vicNum * 40)))
                     {
                         vic = new MyPed(GangPedDict[VictimGang].RandomElement(), vicPos.Position, vicPos.Heading);
@@ -100,7 +103,10 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                     VictimList.Add(vic);
                     vic.BlockPermanentEvents = true;
                     vic.IsPersistent = true;
+                    vic.Inventory.Weapons.Clear();
+                    vic.Money = 0;
                     vicNum++;
+                    vic.IsRagdoll = true;
                     vic.Kill();
                 }
             }

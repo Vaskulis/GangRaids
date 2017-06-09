@@ -37,7 +37,7 @@ namespace GangsOfSouthLS.Callouts
         private bool gangstersSeePlayer = false;
         private bool glueCar = false;
         private bool merchantdeathnoted = false;
-        private Conversation RacketConversation;
+        private RacketConversation RacketConversation;
         private bool isLSPDFRPlusRunning;
         private bool isComputerPlusRunning;
         private Guid callID;
@@ -53,16 +53,16 @@ namespace GangsOfSouthLS.Callouts
             }
             Scenario = new Scenario(ScenarioTemplate);
             Suspectlist = new List<MyPed> { };
-            RacketConversation = new Conversation(ConversationPartCollection.ConverstaionPartsCollections);
+            RacketConversation = new RacketConversation(ConversationPartCollection.ConverstaionPartsCollections);
             CalloutMessage = "Protection Racketeering ~w~at ~y~" + Scenario.Name;
             CalloutPosition = Scenario.Position;
             if (!(Scenario.ShopNameString == "NONE"))
             {
-                Functions.PlayScannerAudio(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT AT {1} SUSPECTS_ARE_MEMBERS_OF {2} UNITS_RESPOND_CODE_02_02", INIReader.UnitName, Scenario.ShopNameString, Scenario.GangNameString));
+                Functions.PlayScannerAudio(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT AT {1} SUSPECTS_ARE_MEMBERS_OF {2} UNITS_RESPOND_CODE_02_02", INIReader.UnitNameAudio, Scenario.ShopNameString, Scenario.GangNameString));
             }
             else
             {
-                Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT IN_OR_ON_POSITION SUSPECTS_ARE_MEMBERS_OF {1} UNITS_RESPOND_CODE_02_02", INIReader.UnitName, Scenario.GangNameString), CalloutPosition);
+                Functions.PlayScannerAudioUsingPosition(string.Format("DISP_ATTENTION_UNIT_01 {0} ASSISTANCE_REQUIRED FOR CRIME_GANGACTIVITYINCIDENT IN_OR_ON_POSITION SUSPECTS_ARE_MEMBERS_OF {1} UNITS_RESPOND_CODE_02_02", INIReader.UnitNameAudio, Scenario.GangNameString), CalloutPosition);
             }
             Functions.PlayScannerAudio("SUSPECTS_ARE_MEMBERS_OF " + Scenario.GangNameString);
             ShowCalloutAreaBlipBeforeAccepting(CalloutPosition, 80f);
