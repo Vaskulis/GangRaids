@@ -86,6 +86,8 @@
     <Compile Include="HelperClasses\CommonUtilities\MyPed.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\BurnCarScenarioTemplate.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\CorrectOwnerHouseScenario.cs" />
+    <Compile Include="HelperClasses\DriveByShootingHelpers\HouseScenario.cs" />
+    <Compile Include="HelperClasses\DriveByShootingHelpers\IncorrectOwnerHouseScenario.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\OwnerHouseScenarioTemplate.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\Statements.cs" />
     <Compile Include="HelperClasses\DriveByShootingHelpers\SuspectCarTemplate.cs" />

@@ -12,35 +12,26 @@ using System.Threading.Tasks;
 
 namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 {
-    class CorrectOwnerHouseScenario
+    class CorrectOwnerHouseScenario : HouseScenario
     {
-        internal string Address;
         internal Vehicle SuspectCar;
-        internal List<MyPed> SuspectList;
-        internal Vector3 Location;
-        internal Blip Blip;
-        internal ECOHSState State;
+        internal MyPed Owner;
 
         private List<string> SuspectPistolList = new List<string> { "weapon_pistol", "weapon_snspistol", "weapon_combatpistol", "weapon_pistol50", "weapon_microsmg" };
         private bool isCarThere;
         private bool HasPlayerBeenAddedToPursuit;
-        private OwnerHouseScenarioTemplate ScenarioTemplate;
         private LHandle pursuit;
 
 
-
-        internal CorrectOwnerHouseScenario(OwnerHouseScenarioTemplate scenarioTemplate, SuspectCarTemplate carTemplate, CrimeSceneScenario CSScenario)
+        internal CorrectOwnerHouseScenario(OwnerHouseScenarioTemplate scenarioTemplate, SuspectCarTemplate carTemplate, CrimeSceneScenario CSScenario) : base(scenarioTemplate, CSScenario)
         {
-            ScenarioTemplate = scenarioTemplate;
-            Address = ScenarioTemplate.Address;
-            Location = ScenarioTemplate.PossibleCarSpawnList[0].Position;
             carTemplate.Address = Address;
 
             isCarThere = false;
             HasPlayerBeenAddedToPursuit = false;
 
             var carSpawn = ScenarioTemplate.PossibleCarSpawnList.RandomElement();
-            foreach (var veh in World.GetEntities(carSpawn.Position, 5f, GetEntitiesFlags.ConsiderAllVehicles))
+            foreach (var veh in World.GetEntities(carSpawn.Position, 5f, GetEntitiesFlags.ConsiderAllVehicles | GetEntitiesFlags.ExcludePlayerVehicle))
             {
                 veh.SafelyDelete();
             }
@@ -50,56 +41,39 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                 SuspectCar.IsPersistent = true;
                 isCarThere = true;
             }
-            foreach (var susSpawn in ScenarioTemplate.PossibleSuspectSpawnList)
+
+            foreach (var sus in SuspectList)
             {
-                foreach (var ped in World.GetEntities(susSpawn.Position, 30f, GetEntitiesFlags.ConsiderHumanPeds))
-                {
-                    ped.SafelyDelete();
-                }
+                sus.Inventory.GiveNewWeapon(SuspectPistolList.RandomElement(), 999, false);
             }
 
-            SuspectList = new List<MyPed> { };
-            var susNum = 0;
-            foreach (var susSpawn in ScenarioTemplate.PossibleSuspectSpawnList)
-            {
-                if (UsefulFunctions.Decide(100 - susNum * 40))
-                {
-                    var sus = new MyPed(CSScenario.GangPedDict[CSScenario.SuspectGang].RandomElement(), susSpawn.Position, susSpawn.Heading);
-                    sus.RandomizeVariation();
-                    sus.RelationshipGroup = "DRIVEBY_SUSPECT";
-                    sus.BlockPermanentEvents = true;
-                    sus.IsPersistent = true;
-                    sus.Inventory.GiveNewWeapon(SuspectPistolList.RandomElement(), 999, false);
-                    susNum++;
-                    SuspectList.Add(sus);
-                }
-            }
+            Owner = SuspectList[0];
+
             Game.LogTrivial("[GangsOfSouthLS] Initialized CorrectOwnerHouseScenario.");
-            Game.LogTrivial("[GangsOfSouthLS] Spawned " + susNum + " suspects.");
+            Game.LogTrivial("[GangsOfSouthLS] Spawned " + SuspectList.Count + " suspects.");
             Game.LogTrivial("[GangsOfSouthLS] Is the car there: " + isCarThere);
 
-            State = ECOHSState.Initialized;
         }
 
 
-        internal void PlayAction()
+        internal override void PlayAction()
         {
-            if (State == ECOHSState.Initialized)
+            if (State == EHouseState.Initialized)
             {
                 SetEnRoute();
             }
 
-            if (State == ECOHSState.EnRoute)
+            if (State == EHouseState.EnRoute)
             {
                 if (Game.LocalPlayer.Character.DistanceTo(Location) < 40f)
                 {
                     Game.LogTrivial("[GangsOfSouthLS] Arrived at correct owner's house.");
                     Blip.SafelyDelete();
-                    State = ECOHSState.Arrived;
+                    State = EHouseState.Arrived;
                 }
                 foreach (var susSpawn in ScenarioTemplate.PossibleSuspectSpawnList)
                 {
-                    foreach (var ped in World.GetEntities(susSpawn.Position, 30f, GetEntitiesFlags.ConsiderHumanPeds))
+                    foreach (var ped in World.GetEntities(susSpawn.Position, 30f, GetEntitiesFlags.ConsiderHumanPeds | GetEntitiesFlags.ExcludePlayerPed))
                     {
                         if (!SuspectList.Contains(ped))
                         {
@@ -109,7 +83,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                 }
             }
 
-            if (State == ECOHSState.Arrived)
+            if (State == EHouseState.Arrived)
             {
                 if (UsefulFunctions.Decide(20))
                 {
@@ -129,7 +103,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                 }
             }
 
-            if (State == ECOHSState.FightingOrFleeing)
+            if (State == EHouseState.FightingOrFleeing)
             {
                 GameFiber.Yield();
                 var stillFightingOrFleeing = false;
@@ -143,34 +117,55 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                     {
                         stillFightingOrFleeing = true;
                     }
-                }                
+                }
                 if (!stillFightingOrFleeing)
                 {
-                    State = ECOHSState.Ending;
+                    State = EHouseState.Ending;
                 }
             }
 
-            if (State == ECOHSState.Talking)
+            if (State == EHouseState.Talking)
             {
+                GameFiber.Yield();
                 Game.DisplayHelp("Press ~b~Y ~w~while standing close to a ~o~suspect ~w~to identify the owner and arrest them.");
+                var stillFightingOrFleeing = false;
+                foreach (var suspect in SuspectList)
+                {
+                    if (suspect.SafelyIsDeadOrArrested())
+                    {
+                        suspect.Blip.SafelyDelete();
+                    }
+                    else
+                    {
+                        stillFightingOrFleeing = true;
+                    }
+                }
+                if (!stillFightingOrFleeing)
+                {
+                    State = EHouseState.Ending;
+                }
+
             }
         }
 
 
-        private void SetEnRoute()
+        internal override void SetEnRoute()
         {
-            State = ECOHSState.EnRoute;
+            base.SetEnRoute();
             Game.LogTrivial("[GangsOfSouthLS] En Route to correct owner.");
-            Blip = new Blip(Location, 50f);
-            Blip.Alpha = 0.5f;
-            Blip.Color = Color.Yellow;
-            Blip.EnableRoute(Color.Yellow);
+        }
+
+
+        internal override void End()
+        {
+            base.End();
+            SuspectCar.SafelyDelete();
         }
 
 
         private void MakeSuspectsFightOrFlee()
         {
-            State = ECOHSState.FightingOrFleeing;
+            State = EHouseState.FightingOrFleeing;
 
             pursuit = Functions.CreatePursuit();
             Game.SetRelationshipBetweenRelationshipGroups("DRIVEBY_SUSPECT", "PLAYER", Relationship.Hate);
@@ -181,26 +176,27 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
             {
                 GameFiber.StartNew(delegate
                 {
-                    SuspectList[0].Type = MyPed.EType.Suspect;
-                    SuspectList[0].AddBlip();
-                    SuspectList[0].Tasks.EnterVehicle(SuspectCar, -1, 3f);
-                    GameFiber.WaitUntil(() => SuspectList[0].IsInAnyVehicle(false), 6000);
-                    if (SuspectList[0].IsInAnyVehicle(false))
+                    Owner.Type = MyPed.EType.Suspect;
+                    Owner.AddBlip();
+                    Owner.Tasks.EnterVehicle(SuspectCar, -1, 3f);
+                    GameFiber.WaitUntil(() => Owner.IsInAnyVehicle(false), 6000);
+                    if (Owner.IsInAnyVehicle(false))
                     {
-                        AddToPursuitAndDeleteBlip(SuspectList[0]);
+                        AddToPursuitAndDeleteBlip(Owner);
                     }
                     else
                     {
-                        SuspectList[0].Tasks.FightAgainstClosestHatedTarget(50f);
+                        Owner.Tasks.FightAgainstClosestHatedTarget(50f);
                     }
                 });
             }
             else
             {
-                SuspectList[0].Tasks.FightAgainstClosestHatedTarget(50f);
+                Owner.AddBlip();
+                Owner.Tasks.FightAgainstClosestHatedTarget(50f);
             }
 
-            foreach (var suspect in SuspectList.Where(n => n != SuspectList[0]))
+            foreach (var suspect in SuspectList.Where(n => n != Owner))
             {
                 suspect.Type = MyPed.EType.Suspect;
                 if (UsefulFunctions.Decide(70))
@@ -218,48 +214,48 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
 
         private void MakeSuspectsTalk()
         {
-            State = ECOHSState.Talking;
+            State = EHouseState.Talking;
 
             var QuestionList = new List<string>
-            {
-                "LSPD. I am looking for " + SuspectList[0].Name + ".",
-                "Good day! I am here for "  + SuspectList[0].Name + "."
-            };
+                {
+                    "LSPD. I am looking for " + Owner.Name + ".",
+                    "Good day! I am here for "  + Owner.Name + "."
+                };
 
             var PrimarySuspectPlainReplyList = new List<string>
-            {
-                "Man, you must be mistaking me for somebody else.",
-                "Yeah, that's me. So what?",
-                "I don't know, I think I have heard that name before.",
-                "What? Well look somewhere else!"
-            };
+                {
+                    "Man, you must be mistaking me for somebody else.",
+                    "Yeah, that's me. So what?",
+                    "I don't know, I think I have heard that name before.",
+                    "What? Well look somewhere else!"
+                };
 
             var PrimarySuspectReplyActionList = new List<string>
-            {
-                "Oh hell no!",
-                "I don't think so."
-            };
+                {
+                    "Oh hell no!",
+                    "I don't think so."
+                };
 
             var SecondarySuspectPlainReplyList = new List<string>
-            {
-                "I don't know, I think I have heard that name before.",
-                "What do you want from him? I can give him an alibi for any time you want.",
-                "What? Well look somewhere else!"
-            };
+                {
+                    "I don't know, I think I have heard that name before.",
+                    "What do you want from him? I can give him an alibi for any time you want.",
+                    "What? Well look somewhere else!"
+                };
 
             var SecondarySuspectReplyActionList = new List<string>
-            {
-                "Oh hell no!",
-                "I don't think so.",
-                "This wasn't supposed to happen!"
-            };
+                {
+                    "Oh hell no!",
+                    "I don't think so.",
+                    "This wasn't supposed to happen!"
+                };
 
             foreach (var sus in SuspectList)
             {
                 sus.AddBlip();
                 sus.StartNewConversation();
                 sus.Conversation.AddAskForIDItem(70);
-                if (sus != SuspectList[0])
+                if (sus != Owner)
                 {
                     if (UsefulFunctions.Decide(20))
                     {
@@ -273,7 +269,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                 else
                 {
                     {
-                        if (UsefulFunctions.Decide(30))
+                        if (UsefulFunctions.Decide(20))
                         {
                             sus.Conversation.AddLine(QuestionList.RandomElement(), PrimarySuspectReplyActionList.RandomElement(), MakeSuspectsFightOrFlee);
                         }
@@ -296,29 +292,6 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
                 HasPlayerBeenAddedToPursuit = true;
                 Functions.SetPursuitIsActiveForPlayer(pursuit, true);
             }
-        }
-
-
-
-        internal void End()
-        {
-            foreach (var sus in SuspectList)
-            {
-                sus.SafelyDelete();
-            }
-            Blip.SafelyDelete();
-            SuspectCar.SafelyDelete();
-        }
-
-
-        internal enum ECOHSState
-        {
-            Initialized,
-            EnRoute,
-            Arrived,
-            FightingOrFleeing,
-            Talking,
-            Ending
         }
     }
 }

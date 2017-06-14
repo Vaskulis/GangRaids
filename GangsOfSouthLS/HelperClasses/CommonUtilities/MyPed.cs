@@ -150,6 +150,23 @@ namespace GangsOfSouthLS.HelperClasses.CommonUtilities
         }
 
 
+        public override void Delete()
+        {
+            Blip.SafelyDelete();
+            base.Delete();
+        }
+
+
+        public void Dismiss(bool deleteBlip=true)
+        {
+            if (deleteBlip)
+            {
+                Blip.SafelyDelete();
+            }
+            base.Dismiss();
+        }
+
+
         private void CalculateAge()
         {
             var today = World.DateTime;

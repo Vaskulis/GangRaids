@@ -107,7 +107,7 @@ namespace GangsOfSouthLS.HelperClasses.DriveByShootingHelpers
         }
 
 
-        internal void CompleteInformation()
+        internal void CompleteVehicleInformation()
         {
             foreach (EInformation info in Enum.GetValues(typeof(EInformation)))
             {
